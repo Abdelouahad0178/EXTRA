@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoDeal Pro - Gestion Point de Vente</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div style="display: flex; align-items: center;">
+                    <div class="logo">🚗 AutoDeal Pro</div>
+                    <div id="firebaseStatus" class="firebase-status firebase-disconnected">
+                        🔴 Firebase déconnecté
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button class="btn btn-primary" onclick="showAddCarModal()" id="addCarBtn" disabled>
+                        ➕ Voiture
+                    </button>
+                    <button class="btn btn-secondary" onclick="showAddClientModal()" id="addClientBtn" disabled>
+                        👤 Client
+                    </button>
+                    <button class="btn btn-warning" onclick="showAddSalesmanModal()" id="addSalesmanBtn" disabled>
+                        👨‍💼 Vendeur
+                    </button>
+                    <button class="btn btn-info" onclick="exportData()" id="exportBtn" disabled>
+                        📤 Export
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Firebase Configuration -->
+            <div id="firebaseConfigSection" class="firebase-config-form">
+                <h3>🔧 Configuration Firebase</h3>
+                <p style="color: rgba(255,255,255,0.8); margin-bottom: 1rem;">
+                    Veuillez configurer votre projet Firebase pour commencer à utiliser l'application.
+                </p>
+                <div class="form-row">
+                    <input type="text" class="form-input" id="apiKey" placeholder="API Key">
+                    <input type="text" class="form-input" id="authDomain" placeholder="Auth Domain">
+                </div>
+                <div class="form-row">
+                    <input type="text" class="form-input" id="projectId" placeholder="Project ID">
+                    <input type="text" class="form-input" id="appId" placeholder="App ID">
+                </div>
+                <button class="btn btn-primary" onclick="initializeFirebase()" style="margin-top: 1rem;">
+                    🚀 Connecter Firebase
+                </button>
+            </div>
+
+            <!-- Main Application Content -->
+            <div id="appContent" class="hidden">
+                <!-- Tabs Navigation -->
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('inventory')">🚗 Inventaire</button>
+                    <button class="tab" onclick="switchTab('clients')">👥 Clients</button>
+                    <button class="tab" onclick="switchTab('salesmen')">👨‍💼 Vendeurs</button>
+                    <button class="tab" onclick="switchTab('quotes')">📄 Devis</button>
+                    <button class="tab" onclick="switchTab('sales')">💰 Ventes</button>
+                    <button class="tab" onclick="switchTab('reservations')">📅 Réservations</button>
+                    <button class="tab" onclick="switchTab('dashboard')">📊 Tableau de bord</button>
+                </div>
+
+                <!-- Inventory Tab -->
+                <div id="inventoryTab" class="tab-content active">
+                    <div class="section">
+                        <h2 class="section-title">🚗 Inventaire des Véhicules</h2>
+                        
+                        <div class="search-filters">
+                            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Rechercher...">
+                            <select class="filter-select" id="brandFilter">
+                                <option value="">Toutes les marques</option>
+                            </select>
+                            <select class="filter-select" id="yearFilter">
+                                <option value="">Toutes les années</option>
+                            </select>
+                            <select class="filter-select" id="priceFilter">
+                                <option value="">Tous les prix</option>
+                                <option value="0-100000">0 - 100 000 DHS</option>
+                                <option value="100000-200000">100 000 - 200 000 DHS</option>
+                                <option value="200000-300000">200 000 - 300 000 DHS</option>
+                                <option value="300000+">300 000+ DHS</option>
+                            </select>
+                            <select class="filter-select" id="statusFilter">
+                                <option value="">Tous les statuts</option>
+                                <option value="available">Disponible</option>
+                                <option value="reserved">Réservé</option>
+                                <option value="sold">Vendu</option>
+                            </select>
+                            <select class="filter-select" id="cityFilter">
+                                <option value="">Toutes les villes</option>
+                            </select>
+                        </div>
+
+                        <div class="loading" id="loading">
+                            <div class="spinner"></div>
+                            <p>Chargement des véhicules...</p>
+                        </div>
+
+                        <div class="cars-grid" id="carsGrid"></div>
+                    </div>
+                </div>
+
+                <!-- Clients Tab -->
+                <div id="clientsTab" class="tab-content">
+                    <div class="section">
+                        <h2 class="section-title">👥 Gestion des Clients</h2>
+                        <div id="clientsList"></div>
+                    </div>
+                </div>
+
+                <!-- Salesmen Tab -->
+                <div id="salesmenTab" class="tab-content">
+                    <div class="section">
+                        <h2 class="section-title">👨‍💼 Équipe de Vente</h2>
+                        <div id="salesmenList"></div>
+                    </div>
+                </div>
+
+                <!-- Quotes Tab -->
+                <div id="quotesTab" class="tab-content">
+                    <div class="section">
+                        <h2 class="section-title">📄 Devis</h2>
+                        <div class="table-container">
+                            <table id="quotesTable">
+                                <thead>
+                                    <tr>
+                                        <th>N° Devis</th>
+                                        <th>Client</th>
+                                        <th>Véhicule</th>
+                                        <th>Montant</th>
+                                        <th>Date</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="quotesTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sales Tab -->
+                <div id="salesTab" class="tab-content">
+                    <div class="section">
+                        <h2 class="section-title">💰 Historique des Ventes</h2>
+                        <div id="salesList"></div>
+                    </div>
+                </div>
+
+                <!-- Reservations Tab -->
+                <div id="reservationsTab" class="tab-content">
+                    <div class="section">
+                        <h2 class="section-title">📅 Réservations</h2>
+                        <div class="table-container">
+                            <table id="reservationsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Client</th>
+                                        <th>Véhicule</th>
+                                        <th>Date réservation</th>
+                                        <th>Expire le</th>
+                                        <th>Acompte</th>
+                                        <th>Statut</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reservationsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Tab -->
+                <div id="dashboardTab" class="tab-content">
+                    <div class="section">
+                        <h2 class="section-title">📊 Tableau de Bord</h2>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-number" id="totalCars">0</div>
+                                <div class="stat-label">Voitures en stock</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="totalValue">0 DHS</div>
+                                <div class="stat-label">Valeur totale</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="totalSales">0</div>
+                                <div class="stat-label">Ventes ce mois</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="totalRevenue">0 DHS</div>
+                                <div class="stat-label">Chiffre d'affaires</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="totalClients">0</div>
+                                <div class="stat-label">Clients actifs</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-number" id="pendingQuotes">0</div>
+                                <div class="stat-label">Devis en attente</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Car Modal -->
+    <div class="modal" id="carModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Ajouter une voiture</h3>
+                <button class="close-btn" onclick="closeModal('carModal')">&times;</button>
+            </div>
+            
+            <form id="carForm">
+                <!-- Informations de base -->
+                <h4 style="margin: 0 0 1rem 0; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 0.5rem;">
+                    🚗 Informations du véhicule
+                </h4>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Marque *</label>
+                        <select class="form-select" id="brand" required>
+                            <option value="">Sélectionner une marque</option>
+                            <option value="Renault">Renault</option>
+                            <option value="Peugeot">Peugeot</option>
+                            <option value="Citroën">Citroën</option>
+                            <option value="Volkswagen">Volkswagen</option>
+                            <option value="Mercedes">Mercedes</option>
+                            <option value="BMW">BMW</option>
+                            <option value="Audi">Audi</option>
+                            <option value="Toyota">Toyota</option>
+                            <option value="Nissan">Nissan</option>
+                            <option value="Honda">Honda</option>
+                            <option value="Hyundai">Hyundai</option>
+                            <option value="Kia">Kia</option>
+                            <option value="Ford">Ford</option>
+                            <option value="Opel">Opel</option>
+                            <option value="Fiat">Fiat</option>
+                            <option value="Seat">Seat</option>
+                            <option value="Skoda">Skoda</option>
+                            <option value="Mazda">Mazda</option>
+                            <option value="Mitsubishi">Mitsubishi</option>
+                            <option value="Suzuki">Suzuki</option>
+                            <option value="Dacia">Dacia</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Modèle *</label>
+                        <input type="text" class="form-input" id="model" required placeholder="Ex: Clio, 308, Golf...">
+                    </div>
+                </div>
+
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label class="form-label">Année *</label>
+                        <input type="number" class="form-input" id="year" min="1990" max="2024" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Kilométrage *</label>
+                        <input type="number" class="form-input" id="mileage" min="0" required placeholder="Ex: 50000">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Prix (DHS) *</label>
+                        <input type="number" class="form-input" id="price" min="0" required placeholder="Ex: 120000">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Carburant</label>
+                        <select class="form-select" id="fuel">
+                            <option value="Essence">Essence</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="Hybride">Hybride</option>
+                            <option value="Électrique">Électrique</option>
+                            <option value="GPL">GPL</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Transmission</label>
+                        <select class="form-select" id="transmission">
+                            <option value="Manuelle">Manuelle</option>
+                            <option value="Automatique">Automatique</option>
+                            <option value="Semi-automatique">Semi-automatique</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Couleur</label>
+                        <select class="form-select" id="color">
+                            <option value="">Sélectionner une couleur</option>
+                            <option value="Blanc">Blanc</option>
+                            <option value="Noir">Noir</option>
+                            <option value="Gris">Gris</option>
+                            <option value="Argent">Argent</option>
+                            <option value="Bleu">Bleu</option>
+                            <option value="Rouge">Rouge</option>
+                            <option value="Vert">Vert</option>
+                            <option value="Jaune">Jaune</option>
+                            <option value="Orange">Orange</option>
+                            <option value="Marron">Marron</option>
+                            <option value="Violet">Violet</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">N° Châssis</label>
+                        <input type="text" class="form-input" id="vin" placeholder="Ex: VF1CB11H0VW123456">
+                    </div>
+                </div>
+
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label class="form-label">Nombre de portes</label>
+                        <select class="form-select" id="doors">
+                            <option value="">Sélectionner</option>
+                            <option value="2">2 portes</option>
+                            <option value="3">3 portes</option>
+                            <option value="4">4 portes</option>
+                            <option value="5">5 portes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Puissance fiscale (CV)</label>
+                        <input type="number" class="form-input" id="fiscalPower" min="1" max="50" placeholder="Ex: 6">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cylindrée (L)</label>
+                        <input type="number" step="0.1" class="form-input" id="engineSize" min="0.8" max="8.0" placeholder="Ex: 1.6">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">État du véhicule</label>
+                        <select class="form-select" id="condition">
+                            <option value="Excellent">Excellent état</option>
+                            <option value="Très bon">Très bon état</option>
+                            <option value="Bon">Bon état</option>
+                            <option value="Correct">État correct</option>
+                            <option value="À rénover">À rénover</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Première main</label>
+                        <select class="form-select" id="firstOwner">
+                            <option value="Oui">Oui</option>
+                            <option value="Non">Non</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Informations du propriétaire -->
+                <h4 style="margin: 2rem 0 1rem 0; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 0.5rem;">
+                    📞 Informations du propriétaire
+                </h4>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Nom du propriétaire *</label>
+                        <input type="text" class="form-input" id="ownerName" required placeholder="Ex: Ahmed Bennani">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Téléphone du propriétaire *</label>
+                        <input type="tel" class="form-input" id="ownerPhone" required placeholder="Ex: 0661234567">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Ville</label>
+                        <select class="form-select" id="city">
+                            <option value="">Sélectionner une ville</option>
+                            <option value="Casablanca">Casablanca</option>
+                            <option value="Rabat">Rabat</option>
+                            <option value="Marrakech">Marrakech</option>
+                            <option value="Fès">Fès</option>
+                            <option value="Tanger">Tanger</option>
+                            <option value="Agadir">Agadir</option>
+                            <option value="Meknès">Meknès</option>
+                            <option value="Oujda">Oujda</option>
+                            <option value="Kénitra">Kénitra</option>
+                            <option value="Tétouan">Tétouan</option>
+                            <option value="Safi">Safi</option>
+                            <option value="Mohammedia">Mohammedia</option>
+                            <option value="Khouribga">Khouribga</option>
+                            <option value="El Jadida">El Jadida</option>
+                            <option value="Béni Mellal">Béni Mellal</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Quartier/Zone</label>
+                        <input type="text" class="form-input" id="district" placeholder="Ex: Maarif, Hay Riad...">
+                    </div>
+                </div>
+
+                <!-- Équipements -->
+                <h4 style="margin: 2rem 0 1rem 0; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 0.5rem;">
+                    🔧 Équipements et options
+                </h4>
+
+                <div class="equipment-grid">
+                    <label class="equipment-item">
+                        <input type="checkbox" id="airCon"> Climatisation
+                    </label>
+                    <label class="equipment-item">
+                        <input type="checkbox" id="powerSteering"> Direction assistée
+                    </label>
+                    <label class="equipment-item">
+                        <input type="checkbox" id="electricWindows"> Vitres électriques
+                    </label>
+                    <label class="equipment-item">
+                        <input type="checkbox" id="abs"> ABS
+                    </label>
+                    <label class="equipment-item">
+                        <input type="checkbox" id="airbags"> Airbags
+                    </label>
+                    <label class="equipment-item">
+                        <input type="checkbox" id="gps"> GPS/Navigation
+                    </label>
+                    <label class="equipment-item">
+                        <input type="checkbox" id="bluetooth"> Bluetooth
+                    </label>
+                    <label class="equipment-item">
+                        <input type="checkbox" id="cruiseControl"> Régulateur de vitesse
+                    </label>
+                    <label class="equipment-item">
+                        <input type="checkbox" id="centralLocking"> Fermeture centralisée
+                    </label>
+                    <label class="equipment-item">
+                        <input type="checkbox" id="parkingSensors"> Capteurs de parking
+                    </label>
+                    <label class="equipment-item">
+                        <input type="checkbox" id="sunroof"> Toit ouvrant
+                    </label>
+                    <label class="equipment-item">
+                        <input type="checkbox" id="leatherSeats"> Sièges cuir
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" id="description" placeholder="Description détaillée du véhicule, historique, entretien..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Photos du véhicule</label>
+                    <div class="photo-upload-container">
+                        <div class="photo-upload-area" id="photoUploadArea">
+                            <p>📸 Cliquez ou glissez-déposez vos photos ici</p>
+                            <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+                                Formats acceptés: JPG, PNG, WebP (max 5MB par photo)
+                            </p>
+                            <input type="file" id="photoInput" multiple accept="image/*" style="display: none;">
+                        </div>
+                        <div class="photo-upload-progress" id="uploadProgress" style="display: none;">
+                            <div class="photo-upload-progress-bar" id="uploadProgressBar"></div>
+                        </div>
+                        <div class="uploaded-photos" id="uploadedPhotos"></div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('carModal')">Annuler</button>
+                    <button type="submit" class="btn btn-primary" id="carSubmitBtn">
+                        <span id="submitBtnText">Ajouter</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Client Modal -->
+    <div class="modal" id="clientModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="clientModalTitle">Ajouter un client</h3>
+                <button class="close-btn" onclick="closeModal('clientModal')">&times;</button>
+            </div>
+            
+            <form id="clientForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Nom *</label>
+                        <input type="text" class="form-input" id="clientName" required placeholder="Ex: Bennani">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Prénom *</label>
+                        <input type="text" class="form-input" id="clientFirstName" required placeholder="Ex: Ahmed">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Téléphone *</label>
+                        <input type="tel" class="form-input" id="clientPhone" required placeholder="Ex: 0661234567">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="clientEmail" placeholder="Ex: ahmed@email.com">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Ville</label>
+                        <select class="form-select" id="clientCity">
+                            <option value="">Sélectionner une ville</option>
+                            <option value="Casablanca">Casablanca</option>
+                            <option value="Rabat">Rabat</option>
+                            <option value="Marrakech">Marrakech</option>
+                            <option value="Fès">Fès</option>
+                            <option value="Tanger">Tanger</option>
+                            <option value="Agadir">Agadir</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">CIN</label>
+                        <input type="text" class="form-input" id="clientCin" placeholder="Ex: AB123456">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Adresse</label>
+                    <textarea class="form-textarea" id="clientAddress" placeholder="Adresse complète..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Date de naissance</label>
+                        <input type="date" class="form-input" id="clientBirthDate">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Profession</label>
+                        <input type="text" class="form-input" id="clientProfession" placeholder="Ex: Ingénieur">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-textarea" id="clientNotes" placeholder="Informations supplémentaires..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('clientModal')">Annuler</button>
+                    <button type="submit" class="btn btn-primary" id="clientSubmitBtn">
+                        <span id="clientSubmitBtnText">Ajouter</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Salesman Modal -->
+    <div class="modal" id="salesmanModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="salesmanModalTitle">Ajouter un vendeur</h3>
+                <button class="close-btn" onclick="closeModal('salesmanModal')">&times;</button>
+            </div>
+            
+            <form id="salesmanForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Nom *</label>
+                        <input type="text" class="form-input" id="salesmanName" required placeholder="Ex: Alaoui">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Prénom *</label>
+                        <input type="text" class="form-input" id="salesmanFirstName" required placeholder="Ex: Youssef">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Téléphone *</label>
+                        <input type="tel" class="form-input" id="salesmanPhone" required placeholder="Ex: 0661234567">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="salesmanEmail" placeholder="Ex: youssef@autodeal.ma">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Commission (%)</label>
+                        <input type="number" class="form-input" id="salesmanCommission" min="0" max="100" value="5" placeholder="Ex: 5">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Date d'embauche *</label>
+                        <input type="date" class="form-input" id="salesmanHireDate" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-textarea" id="salesmanNotes" placeholder="Informations supplémentaires..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('salesmanModal')">Annuler</button>
+                    <button type="submit" class="btn btn-primary" id="salesmanSubmitBtn">
+                        <span id="salesmanSubmitBtnText">Ajouter</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.22.0/firebase-firestore-compat.min.js"></script>
+    
+    <!-- Main Script -->
+    <script src="script.js"></script>
+</body>
+</html>

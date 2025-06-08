@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoDeal - Voitures d'occasion au Maroc</title>
+    <link rel="stylesheet" href="client.css">
+    <!-- Firebase Modular SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
+        import { getFirestore, collection, getDocs, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+
+        // Expose Firebase functions to global scope
+        window.firebaseApp = { initializeApp, getFirestore, collection, getDocs, doc, setDoc };
+    </script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">🚗 AutoDeal</div>
+                <button class="menu-toggle" id="menuToggle">☰</button>
+                <nav class="nav-menu" id="navMenu">
+                    <a href="#home" class="nav-link active">Accueil</a>
+                    <a href="#inventory" class="nav-link">Inventaire</a>
+                    <a href="#contact" class="nav-link">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Trouvez votre voiture idéale</h1>
+                <p>Découvrez notre sélection de véhicules d'occasion de qualité au Maroc</p>
+            </div>
+        </section>
+
+        <section class="search-section">
+            <div class="container">
+                <div class="search-filters">
+                    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Recherche">
+                    <select id="brandFilter" class="filter-select">
+                        <option value="">Toutes les marques</option>
+                    </select>
+                    <select id="yearFilter" class="filter-select">
+                        <option value="">Toutes les années</option>
+                    </select>
+                    <select id="priceFilter" class="filter-select">
+                        <option value="">Tous les prix</option>
+                        <option value="100000">100 000 DHS</option>
+                        <option value="200000">200 000 DHS</option>
+                        <option value="300000">300 000 DHS</option>
+                        <option value="500000">500 000 DHS</option>
+                    </select>
+                    <select id="cityFilter" class="filter-select">
+                        <option value="">Toutes les villes</option>
+                    </select>
+                    <select id="fuelFilter" class="filter-select">
+                        <option value="">Tous les carburants</option>
+                        <option value="Essence">Essence</option>
+                        <option value="Diesel">Diesel</option>
+                        <option value="Hybride">Hybride</option>
+                        <option value="Électrique">Électrique</option>
+                    </select>
+                    <button class="btn btn-primary" id="searchBtn">🔍 Rechercher</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="inventory">
+            <div class="container">
+                <div class="sort-controls">
+                    <label for="sortSelect">Trier par:</label>
+                    <select id="sortSelect" class="filter-select">
+                        <option value="recent">Plus récent</option>
+                        <option value="priceAsc">Prix croissant</option>
+                        <option value="priceDesc">Prix décroissant</option>
+                        <option value="mileage">Kilométrage</option>
+                        <option value="year">Année</option>
+                    </select>
+                </div>
+                <div class="cars-grid" id="carsGrid"></div>
+                <div class="loading" id="loading">
+                    <div class="loading-spinner"></div>
+                    <span>Chargement des véhicules...</span>
+                </div>
+                <div class="no-results hidden" id="noResults">
+                    <span class="icon-error">🚗</span>
+                    <h3>Aucune voiture trouvée</h3>
+                    <p>Essayez de modifier vos critères de recherche</p>
+                </div>
+            </section>
+
+        <section class="modal" id="carDetailsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="carDetailsTitle">Détails du véhicule</h2>
+                    <button class="close-btn" onclick="closeModal('carDetailsModal')">×</button>
+                </div>
+                <div class="car-details-content">
+                    <div class="car-images" id="carDetailsImages">
+                        <button class="image-nav prev" onclick="prevImage('carDetailsModal')">&lt;</button>
+                        <button class="image-nav next" onclick="nextImage('carDetailsModal')">&gt;</button>
+                        <div class="image-dots" id="imageDots"></div>
+                    </div>
+                    <div class="car-info">
+                        <h3>📝 Description</h3>
+                        <p id="carDescription"></p>
+                        <h3>🔧 Équipements</h3>
+                        <div class="equipment-tags" id="carEquipment"></div>
+                        <h3>📞 Contacter le propriétaire</h3>
+                        <p id="carOwner"></p>
+                        <div class="car-actions">
+                            <a href="#" id="callButton" class="btn btn-primary">📞 Appeler</a>
+                            <a href="#" id="whatsappButton" class="btn btn-success">💬 WhatsApp</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 AutoDeal - Voitures d'occasion au Maroc</p>
+            <p>Trouvez la voiture de vos rêves en toute confiance</p>
+        </div>
+    </footer>
+
+    <script>
+        // Global variables
+        let db;
+        let cars = [];
+        let currentCarId = null;
+        let currentImageIndex = 0;
+        let isFirebaseConnected = false;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initializeFirebase();
+            if (isFirebaseConnected) {
+                setupEventListeners();
+            }
+        });
+
+        async function initializeFirebase() {
+            const storedConfig = JSON.parse(localStorage.getItem('firebaseConfig') || '{}');
+            if (!storedConfig.apiKey || !storedConfig.projectId) {
+                showNotification('Configuration Firebase manquante. Veuillez configurer via index.html.', 'error');
+                return;
+            }
+
+            try {
+                const firebaseConfig = {
+                    apiKey: storedConfig.apiKey,
+                    authDomain: storedConfig.authDomain || `${storedConfig.projectId}.firebaseapp.com`,
+                    projectId: storedConfig.projectId,
+                    storageBucket: storedConfig.storageBucket || `${storedConfig.projectId}.appspot.com`,
+                    messagingSenderId: storedConfig.messagingSenderId || "123456789",
+                    appId: storedConfig.appId || "1:123456789:web:abcdef123456"
+                };
+
+                const app = window.firebaseApp.initializeApp(firebaseConfig);
+                db = window.firebaseApp.getFirestore(app);
+
+                await window.firebaseApp.setDoc(window.firebaseApp.doc(window.firebaseApp.collection(db, 'test'), 'connection'), {
+                    timestamp: new Date()
+                });
+                isFirebaseConnected = true;
+                showNotification('Firebase connecté', 'success');
+                await loadCars();
+            } catch (error) {
+                console.error('Erreur d\'initialisation Firebase:', error);
+                showNotification('Erreur d\'initialisation Firebase: ' + error.message, 'error');
+            }
+        }
+
+        function setupEventListeners() {
+            const menuToggle = document.getElementById('menuToggle');
+            const searchBtn = document.getElementById('searchBtn');
+            const searchInput = document.getElementById('searchInput');
+            const brandFilter = document.getElementById('brandFilter');
+            const yearFilter = document.getElementById('yearFilter');
+            const priceFilter = document.getElementById('priceFilter');
+            const cityFilter = document.getElementById('cityFilter');
+            const fuelFilter = document.getElementById('fuelFilter');
+            const sortSelect = document.getElementById('sortSelect');
+            const carDetailsModal = document.getElementById('carDetailsModal');
+
+            if (menuToggle) menuToggle.addEventListener('click', toggleMenu);
+            if (searchBtn) searchBtn.addEventListener('click', filterCars);
+            if (searchInput) searchInput.addEventListener('input', filterCars);
+            if (brandFilter) brandFilter.addEventListener('change', filterCars);
+            if (yearFilter) yearFilter.addEventListener('change', filterCars);
+            if (priceFilter) priceFilter.addEventListener('change', filterCars);
+            if (cityFilter) cityFilter.addEventListener('change', filterCars);
+            if (fuelFilter) fuelFilter.addEventListener('change', filterCars);
+            if (sortSelect) sortSelect.addEventListener('change', () => sortCars(cars));
+            if (carDetailsModal) carDetailsModal.addEventListener('click', (e) => {
+                if (e.target === carDetailsModal) {
+                    closeModal('carDetailsModal');
+                }
+            });
+        }
+
+        function toggleMenu() {
+            const navMenu = document.getElementById('navMenu');
+            if (navMenu) navMenu.classList.toggle('active');
+        }
+
+        async function loadCars() {
+            if (!isFirebaseConnected) {
+                showNotification('Firebase non connecté', 'error');
+                return;
+            }
+
+            showLoading(true);
+            try {
+                const snapshot = await window.firebaseApp.getDocs(window.firebaseApp.collection(db, 'cars'));
+                cars = [];
+                snapshot.forEach(doc => {
+                    cars.push({ id: doc.id, ...doc.data() });
+                });
+                populateFilters();
+                sortCars(cars);
+            } catch (error) {
+                console.error('Erreur chargement voitures:', error);
+                showNotification('Erreur lors du chargement des données: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function displayCars(carsToShow = []) {
+            const grid = document.getElementById('carsGrid');
+            const noResults = document.getElementById('noResults');
+
+            if (!grid || !noResults) return;
+
+            if (carsToShow.length === 0) {
+                grid.innerHTML = '';
+                noResults.classList.remove('hidden');
+                return;
+            }
+
+            noResults.classList.add('hidden');
+            grid.innerHTML = carsToShow.map(car => `
+                <div class="car-card ${car.status || 'available'}" onclick="showCarDetails('${car.id}')">
+                    <div class="car-status status-${car.status || 'available'}">
+                        ${getStatusLabel(car.status || 'available')}
+                    </div>
+                    <div class="car-images">
+                        <div class="car-image" id="carImage-${car.id}">
+                            ${car.photos && car.photos.length > 0 ?
+                                `<img src="${car.photos[0].data}" alt="${car.brand} ${car.model}">` :
+                                '🚗'
+                            }
+                        </div>
+                        ${car.photos && car.photos.length > 1 ? `
+                            <button class="image-nav prev" onclick="event.stopPropagation(); prevImage('${car.id}')">&lt;</button>
+                            <button class="image-nav next" onclick="event.stopPropagation(); nextImage('${car.id}')">&gt;</button>
+                            <div class="image-dots">
+                                ${car.photos.map((_, index) => `
+                                    <div class="image-dot ${index === 0 ? 'active' : ''}" onclick="event.stopPropagation(); showImage('${car.id}', ${index})"></div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="car-info">
+                        <div class="car-title">${car.brand || ''} ${car.model || ''}</div>
+                        <div class="car-details">
+                            <span>📅 ${car.year || 'N/A'}</span>
+                            <span>🛣️ ${formatNumber(car.mileage || 0)} km</span>
+                            <span>⛽ ${car.fuel || 'N/A'}</span>
+                            <span>⚙️ ${car.transmission || 'N/A'}</span>
+                        </div>
+                        <div class="car-location">📍 ${car.city || 'Non spécifiée'}</div>
+                        <div class="car-price">${formatPrice(car.price || 0)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showCarDetails(id) {
+            const car = cars.find(c => c.id === id);
+            if (!car) return;
+
+            currentCarId = id;
+            currentImageIndex = 0;
+
+            const title = document.getElementById('carDetailsTitle');
+            const description = document.getElementById('carDescription');
+            const owner = document.getElementById('carOwner');
+            const callButton = document.getElementById('callButton');
+            const whatsappButton = document.getElementById('whatsappButton');
+            const equipment = document.getElementById('carEquipment');
+
+            if (title) title.textContent = `${car.brand || ''} ${car.model || ''} (${car.year || 'N/A'})`;
+            if (description) description.textContent = car.description || 'Aucune description';
+            if (owner) owner.innerHTML = `
+                ${car.ownerName || 'Non renseigné'}<br>
+                📞 ${car.ownerPhone || 'Non renseigné'}
+            `;
+            if (callButton) callButton.href = `tel:${car.ownerPhone || '#'}`;
+            if (whatsappButton) whatsappButton.href = `https://wa.me/${car.ownerPhone || '#'}`;
+            if (equipment) equipment.innerHTML = getCarEquipment(car).length > 0 ?
+                getCarEquipment(car).map(eq => `<span class="equipment-tag">${eq}</span>`).join('') :
+                'Aucun équipement renseigné';
+
+            updateCarImages(car);
+            const modal = document.getElementById('carDetailsModal');
+            if (modal) modal.style.display = 'block';
+        }
+
+        function getCarEquipment(car) {
+            const equipment = [];
+            if (car.airCon) equipment.push('Climatisation');
+            if (car.powerSteering) equipment.push('Direction assistée');
+            if (car.electricWindows) equipment.push('Vitres électriques');
+            if (car.abs) equipment.push('ABS');
+            if (car.airbags) equipment.push('Airbags');
+            if (car.gps) equipment.push('GPS');
+            if (car.bluetooth) equipment.push('Bluetooth');
+            if (car.cruiseControl) equipment.push('Régulateur');
+            if (car.centralLocking) equipment.push('Fermeture centralisée');
+            if (car.parkingSensors) equipment.push('Capteurs parking');
+            if (car.sunroof) equipment.push('Toit ouvrant');
+            if (car.leatherSeats) equipment.push('Sièges cuir');
+            return equipment;
+        }
+
+        function updateCarImages(car) {
+            const imagesContainer = document.getElementById('carDetailsImages');
+            if (!imagesContainer) return;
+
+            if (car.photos && car.photos.length > 0) {
+                imagesContainer.innerHTML = `
+                    <div class="car-image">
+                        <img src="${car.photos[currentImageIndex].data}" alt="${car.brand || ''} ${car.model || ''}">
+                    </div>
+                    ${car.photos.length > 1 ? `
+                        <button class="image-nav prev" onclick="prevImage('${car.id}')">&lt;</button>
+                        <button class="image-nav next" onclick="nextImage('${car.id}')">&gt;</button>
+                        <div class="image-dots" id="imageDots">
+                            ${car.photos.map((_, index) => `
+                                <div class="image-dot ${index === currentImageIndex ? 'active' : ''}" onclick="showImage('${car.id}', ${index})"></div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                `;
+            } else {
+                imagesContainer.innerHTML = '<div class="car-image">🚗</div>';
+            }
+        }
+
+        function prevImage(carId) {
+            const car = cars.find(c => c.id === carId);
+            if (!car || !car.photos || car.photos.length <= 1) return;
+            currentImageIndex = currentImageIndex > 0 ? currentImageIndex - 1 : car.photos.length - 1;
+            updateCarImages(car);
+        }
+
+        function nextImage(carId) {
+            const car = cars.find(c => c.id === carId);
+            if (!car || !car.photos || car.photos.length <= 1) return;
+            currentImageIndex = currentImageIndex < car.photos.length - 1 ? currentImageIndex + 1 : 0;
+            updateCarImages(car);
+        }
+
+        function showImage(carId, index) {
+            const car = cars.find(c => c.id === carId);
+            if (!car || !car.photos || index >= car.photos.length) return;
+            currentImageIndex = index;
+            updateCarImages(car);
+        }
+
+        function filterCars() {
+            const searchInput = document.getElementById('searchInput');
+            const brandFilter = document.getElementById('brandFilter');
+            const yearFilter = document.getElementById('yearFilter');
+            const priceFilter = document.getElementById('priceFilter');
+            const cityFilter = document.getElementById('cityFilter');
+            const fuelFilter = document.getElementById('fuelFilter');
+
+            if (!searchInput || !brandFilter || !yearFilter || !priceFilter || !cityFilter || !fuelFilter) return;
+
+            const searchTerm = searchInput.value.toLowerCase();
+            const brandValue = brandFilter.value;
+            const yearValue = yearFilter.value;
+            const priceValue = priceFilter.value;
+            const cityValue = cityFilter.value;
+            const fuelValue = fuelFilter.value;
+
+            const filtered = cars.filter(car => {
+                const matchesSearch = searchTerm === '' ||
+                    (car.brand || '').toLowerCase().includes(searchTerm) ||
+                    (car.model || '').toLowerCase().includes(searchTerm) ||
+                    (car.description || '').toLowerCase().includes(searchTerm) ||
+                    (car.vin || '').toLowerCase().includes(searchTerm) ||
+                    (car.ownerName || '').toLowerCase().includes(searchTerm) ||
+                    (car.city || '').toLowerCase().includes(searchTerm);
+                const matchesBrand = brandValue === '' || car.brand === brandValue;
+                const matchesYear = yearValue === '' || (car.year || '').toString() === yearValue;
+                const matchesPrice = priceValue === '' || (car.price || 0) <= parseInt(priceValue);
+                const matchesCity = cityValue === '' || car.city === cityValue;
+                const matchesFuel = fuelValue === '' || car.fuel === fuelValue;
+                return matchesSearch && matchesBrand && matchesYear && matchesPrice && matchesCity && matchesFuel;
+            });
+
+            sortCars(filtered);
+        }
+
+        function sortCars(filteredCars = cars) {
+            const sortSelect = document.getElementById('sortSelect');
+            if (!sortSelect || !Array.isArray(filteredCars)) {
+                displayCars([]);
+                return;
+            }
+
+            const sortValue = sortSelect.value;
+            let sorted = [...filteredCars];
+
+            if (sortValue === 'recent') {
+                sorted.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+            } else if (sortValue === 'priceAsc') {
+                sorted.sort((a, b) => (a.price || 0) - (b.price || 0));
+            } else if (sortValue === 'priceDesc') {
+                sorted.sort((a, b) => (b.price || 0) - (a.price || 0));
+            } else if (sortValue === 'mileage') {
+                sorted.sort((a, b) => (a.mileage || 0) - (b.mileage || 0));
+            } else if (sortValue === 'year') {
+                sorted.sort((a, b) => (b.year || 0) - (a.year || 0));
+            }
+
+            displayCars(sorted);
+        }
+
+        function populateFilters() {
+            const brandFilter = document.getElementById('brandFilter');
+            const yearFilter = document.getElementById('yearFilter');
+            const cityFilter = document.getElementById('cityFilter');
+
+            if (!brandFilter || !yearFilter || !cityFilter) return;
+
+            const brands = [...new Set(cars.map(car => car.brand).filter(brand => brand))].sort();
+            brandFilter.innerHTML = '<option value="">Toutes les marques</option>' +
+                brands.map(brand => `<option value="${brand}">${brand}</option>`).join('');
+
+            const years = [...new Set(cars.map(car => car.year).filter(year => year))].sort((a, b) => b - a);
+            yearFilter.innerHTML = '<option value="">Toutes les années</option>' +
+                years.map(year => `<option value="${year}">${year}</option>`).join('');
+
+            const cities = [...new Set(cars.map(car => car.city).filter(city => city))].sort();
+            cityFilter.innerHTML = '<option value="">Toutes les villes</option>' +
+                cities.map(city => `<option value="${city}">${city}</option>`).join('');
+        }
+
+        function getStatusLabel(status) {
+            switch (status) {
+                case 'available': return 'Disponible';
+                case 'reserved': return 'Réservé';
+                case 'sold': return 'Vendu';
+                default: return 'Disponible';
+            }
+        }
+
+        function formatPrice(price) {
+            return new Intl.NumberFormat('fr-MA', {
+                style: 'currency',
+                currency: 'MAD',
+                minimumFractionDigits: 0
+            }).format(price || 0).replace('MAD', 'DHS');
+        }
+
+        function formatNumber(number) {
+            return new Intl.NumberFormat('fr-FR').format(number || 0);
+        }
+
+        function showLoading(show) {
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.style.display = show ? 'block' : 'none';
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => notification.classList.add('show'), 100);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 3000);
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
