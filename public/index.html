@@ -1005,6 +1005,75 @@
             console.error('Erreur Firebase:', error);
             loadingIndicator.innerHTML = '<p style="color: red;">Erreur de connexion à la base de données. Vérifiez votre configuration Firebase.</p>';
         });
+
+// Variables pour la pagination
+let lastVisible = null;
+const CARS_PER_PAGE = 12;
+let isLoading = false;
+let hasMore = true;
+
+// Modifier la requête pour utiliser la pagination
+async function loadCars(loadMore = false) {
+    if (isLoading || (!hasMore && loadMore)) return;
+    
+    isLoading = true;
+    
+    let q;
+    if (loadMore && lastVisible) {
+        q = query(
+            collection(db, 'voitures'),
+            orderBy('dateAjout', 'desc'),
+            startAfter(lastVisible),
+            limit(CARS_PER_PAGE)
+        );
+    } else {
+        q = query(
+            collection(db, 'voitures'),
+            orderBy('dateAjout', 'desc'),
+            limit(CARS_PER_PAGE)
+        );
+    }
+    
+    const snapshot = await getDocs(q);
+    
+    if (snapshot.docs.length < CARS_PER_PAGE) {
+        hasMore = false;
+    }
+    
+    if (snapshot.docs.length > 0) {
+        lastVisible = snapshot.docs[snapshot.docs.length - 1];
+    }
+    
+    const newCars = [];
+    snapshot.forEach((doc) => {
+        newCars.push({
+            id: doc.id,
+            data: doc.data()
+        });
+    });
+    
+    if (loadMore) {
+        allCars = [...allCars, ...newCars];
+    } else {
+        allCars = newCars;
+    }
+    
+    displayCars(allCars);
+    isLoading = false;
+}
+
+// Détection du scroll pour charger plus
+window.addEventListener('scroll', () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000) {
+        loadCars(true);
+    }
+});
+
+
+
+
+
+
     </script>
 </body>
 </html>
