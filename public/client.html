@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoMaroc - Voitures d'Occasion</title>
+    <title data-translate-key="title">AutoMaroc - Voitures d'Occasion</title>
     <link rel="stylesheet" href="client.css">
-   
     <style>
         * {
             margin: 0;
@@ -41,11 +40,41 @@
             --card-bg: rgba(45, 45, 45, 0.95);
         }
 
-        /* Bouton mode sombre */
-        .dark-mode-toggle {
+        /* Support RTL for Arabic */
+        [dir="rtl"] .header-content,
+        [dir="rtl"] .search-bar,
+        [dir="rtl"] .filters-grid,
+        [dir="rtl"] .price-range,
+        [dir="rtl"] .car-specs,
+        [dir="rtl"] .car-actions,
+        [dir="rtl"] .footer-content {
+            direction: rtl;
+        }
+
+        [dir="rtl"] .car-badges {
+            left: auto;
+            right: 15px;
+        }
+
+        [dir="rtl"] .image-counter {
+            right: auto;
+            left: 15px;
+        }
+
+        [dir="rtl"] .dark-mode-toggle {
+            left: auto;
+            right: 20px;
+        }
+
+        [dir="rtl"] .language-toggle {
+            left: 80px;
+            right: auto;
+        }
+
+        /* Bouton mode sombre et langue */
+        .dark-mode-toggle, .language-toggle {
             position: fixed;
             top: 20px;
-            left: 20px;
             background: var(--bg-primary);
             color: var(--text-primary);
             border: 2px solid var(--border-color);
@@ -56,13 +85,17 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 16px;
             z-index: 999;
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        .dark-mode-toggle:hover {
+        .language-toggle {
+            left: 80px;
+        }
+
+        .dark-mode-toggle:hover, .language-toggle:hover {
             transform: scale(1.1);
         }
 
@@ -237,7 +270,7 @@
 
         .cars-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 30px;
             margin-top: 30px;
         }
@@ -371,6 +404,16 @@
             overflow: hidden;
         }
 
+        .car-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-contact, .btn-details {
+            flex: 1;
+            text-align: center;
+        }
+
         /* Loader pour le scroll infini */
         .scroll-loader {
             text-align: center;
@@ -439,6 +482,70 @@
             color: var(--text-secondary);
         }
 
+        /* Modal styles */
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 80vh;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: auto;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+
+        .image-navigation {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.8);
+            border: none;
+            font-size: 24px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .prev-btn {
+            left: 10px;
+        }
+
+        .next-btn {
+            right: 10px;
+        }
+
+        .modal-controls {
+            margin-top: 10px;
+            color: white;
+            font-size: 16px;
+        }
+
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
@@ -467,8 +574,22 @@
             }
 
             .dark-mode-toggle {
-                bottom: 70px;
+                top: auto;
+                bottom: 20px;
+                right: 20px;
+                left: auto;
             }
+
+            .language-toggle {
+                top: auto;
+                bottom: 80px;
+                right: 20px;
+                left: auto;
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -479,142 +600,137 @@
         <span class="dark-icon">🌙</span>
     </button>
 
+    <!-- Bouton langue -->
+    <button class="language-toggle" id="language-toggle" onclick="toggleLanguage()">العربية</button>
+
     <header class="header">
         <div class="header-content">
-            <div class="logo">
-                🚗 AutoMaroc
-            </div>
+            <div class="logo" data-translate-key="logo">🚗 AutoMaroc</div>
             <div class="search-bar">
-                <input type="text" id="searchInput" class="search-input" placeholder="Rechercher par marque, modèle...">
-                <select id="quickFilter" class="filter-select">
-                    <option value="">Toutes les marques</option>
+                <input type="text" id="searchInput" class="search-input" data-translate-placeholder="search_placeholder" placeholder="Rechercher par marque, modèle...">
+                <select id="quickFilter" class="filter-select" data-translate-key="quick_filter">
+                    <option value="" data-translate-key="quick_filter_all">Toutes les marques</option>
                 </select>
             </div>
-            <div class="stats" id="carStats">
-                Chargement...
-            </div>
+            <div class="stats" id="carStats" data-translate-key="stats_loading">Chargement...</div>
         </div>
     </header>
 
     <div class="container">
         <div class="hero-section">
-            <h1>Trouvez Votre Voiture Idéale</h1>
-            <p>Découvrez notre sélection de voitures d'occasion de qualité</p>
+            <h1 data-translate-key="hero_title">Trouvez Votre Voiture Idéale</h1>
+            <p data-translate-key="hero_subtitle">Découvrez notre sélection de voitures d'occasion de qualité</p>
         </div>
 
         <div class="filters-section">
             <div class="filters-grid">
                 <div class="filter-group">
-                    <label>Marque</label>
-                    <select id="marqueFilter" class="filter-select">
-                        <option value="">Toutes les marques</option>
+                    <label data-translate-key="filter_brand_label">Marque</label>
+                    <select id="marqueFilter" class="filter-select" data-translate-key="filter_brand">
+                        <option value="" data-translate-key="filter_brand_all">Toutes les marques</option>
                     </select>
                 </div>
                 
                 <div class="filter-group">
-                    <label>Carburant</label>
-                    <select id="carburantFilter" class="filter-select">
-                        <option value="">Tous types</option>
-                        <option value="Essence">Essence</option>
-                        <option value="Diesel">Diesel</option>
-                        <option value="Hybride">Hybride</option>
-                        <option value="Électrique">Électrique</option>
-                        <option value="GPL">GPL</option>
+                    <label data-translate-key="filter_fuel_label">Carburant</label>
+                    <select id="carburantFilter" class="filter-select" data-translate-key="filter_fuel">
+                        <option value="" data-translate-key="filter_fuel_all">Tous types</option>
+                        <option value="Essence" data-translate-key="filter_fuel_essence">Essence</option>
+                        <option value="Diesel" data-translate-key="filter_fuel_diesel">Diesel</option>
+                        <option value="Hybride" data-translate-key="filter_fuel_hybrid">Hybride</option>
+                        <option value="Électrique" data-translate-key="filter_fuel_electric">Électrique</option>
+                        <option value="GPL" data-translate-key="filter_fuel_gpl">GPL</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
-                    <label>Carrosserie</label>
-                    <select id="carrosserieFilter" class="filter-select">
-                        <option value="">Tous types</option>
-                        <option value="Berline">Berline</option>
-                        <option value="SUV">SUV</option>
-                        <option value="Break">Break</option>
-                        <option value="Coupé">Coupé</option>
-                        <option value="Cabriolet">Cabriolet</option>
-                        <option value="Monospace">Monospace</option>
-                        <option value="Citadine">Citadine</option>
-                        <option value="4x4">4x4</option>
-                        <option value="Pick-up">Pick-up</option>
+                    <label data-translate-key="filter_body_label">Carrosserie</label>
+                    <select id="carrosserieFilter" class="filter-select" data-translate-key="filter_body">
+                        <option value="" data-translate-key="filter_body_all">Tous types</option>
+                        <option value="Berline" data-translate-key="filter_body_berline">Berline</option>
+                        <option value="SUV" data-translate-key="filter_body_suv">SUV</option>
+                        <option value="Break" data-translate-key="filter_body_break">Break</option>
+                        <option value="Coupé" data-translate-key="filter_body_coupe">Coupé</option>
+                        <option value="Cabriolet" data-translate-key="filter_body_cabriolet">Cabriolet</option>
+                        <option value="Monospace" data-translate-key="filter_body_monosp">Monospace</option>
+                        <option value="Citadine" data-translate-key="filter_body_citadine">Citadine</option>
+                        <option value="4x4" data-translate-key="filter_body_4x4">4x4</option>
+                        <option value="Pick-up" data-translate-key="filter_body_pickup">Pick-up</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
-                    <label>Boîte de vitesse</label>
-                    <select id="boiteFilter" class="filter-select">
-                        <option value="">Toutes</option>
-                        <option value="Manuelle">Manuelle</option>
-                        <option value="Automatique">Automatique</option>
-                        <option value="Semi-automatique">Semi-automatique</option>
+                    <label data-translate-key="filter_gear_label">Boîte de vitesse</label>
+                    <select id="boiteFilter" class="filter-select" data-translate-key="boite_filter">
+                        <option value="" data-translate-key="filter_gear_all">Toutes</option>
+                        <option value="Manuelle" data-translate-key="filter_gear_manual">Manuelle</option>
+                        <option value="Automatique" data-translate-key="filter_gear_auto">Automatique</option>
+                        <option value="Semi-automatique" data-translate-key="filter_gear_semi">Semi-automatique</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
-                    <label>État</label>
-                    <select id="etatFilter" class="filter-select">
-                        <option value="">Tous états</option>
-                        <option value="Neuve">Neuve</option>
-                        <option value="Très bon état">Très bon état</option>
-                        <option value="Bon état">Bon état</option>
-                        <option value="État satisfaisant">État satisfaisant</option>
+                    <label data-translate-key="filter_condition_label">État</label>
+                    <select id="etatFilter" class="filter-select" data-translate-key="etat_filter">
+                        <option value="" data-translate-key="filter_condition_all">Tous états</option>
+                        <option value="Neuve" data-translate-key="filter_condition_new">Neuve</option>
+                        <option value="Très bon état" data-translate-key="filter_condition_vgood">Très bon état</option>
+                        <option value="Bon état" data-translate-key="filter_condition_good">Bon état</option>
+                        <option value="État satisfaisant" data-translate-key="filter_condition_fair">État satisfaisant</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
-                    <label>Prix (MAD)</label>
+                    <label data-translate-key="filter_price_label">Prix (MAD)</label>
                     <div class="price-range">
-                        <input type="number" id="prixMin" class="filter-select" placeholder="Min" min="0">
+                        <input type="number" id="prixMin" class="filter-select" data-translate-placeholder="filter_price_min" placeholder="Min" min="0">
                         <span>-</span>
-                        <input type="number" id="prixMax" class="filter-select" placeholder="Max" min="0">
+                        <input type="number" id="prixMax" class="filter-select" data-translate-placeholder="filter_price_max" placeholder="Max" min="0">
                     </div>
                 </div>
 
                 <div class="filter-group">
-                    <label>Année</label>
+                    <label data-translate-key="filter_year_label">Année</label>
                     <div class="price-range">
-                        <input type="number" id="anneeMin" class="filter-select" placeholder="Min" min="1990" max="2024">
+                        <input type="number" id="anneeMin" class="filter-select" data-translate-placeholder="filter_price_min" placeholder="Min" min="1990" max="2025">
                         <span>-</span>
-                        <input type="number" id="anneeMax" class="filter-select" placeholder="Max" min="1990" max="2024">
+                        <input type="number" id="anneeMax" class="filter-select" data-translate-placeholder="filter_price_max" placeholder="Max" min="1990" max="2025">
                     </div>
                 </div>
 
                 <div class="filter-group">
-                    <label>Kilométrage</label>
+                    <label data-translate-key="filter_mileage_label">Kilométrage</label>
                     <div class="price-range">
-                        <input type="number" id="kmMin" class="filter-select" placeholder="Min" min="0">
+                        <input type="number" id="kmMin" class="filter-select" data-translate-placeholder="filter_price_min" placeholder="Min" min="0">
                         <span>-</span>
-                        <input type="number" id="kmMax" class="filter-select" placeholder="Max" min="0">
+                        <input type="number" id="kmMax" class="filter-select" data-translate-placeholder="filter_price_max" placeholder="Max" min="0">
                     </div>
                 </div>
 
                 <div class="filter-group">
-                    <button class="btn" onclick="applyFilters()">Filtrer</button>
+                    <button class="btn" onclick="applyFilters()" data-translate-key="filter_button">Filtrer</button>
                 </div>
 
                 <div class="filter-group">
-                    <button class="btn btn-clear" onclick="clearFilters()">Effacer</button>
+                    <button class="btn btn-clear" onclick="clearFilters()" data-translate-key="clear_button">Effacer</button>
                 </div>
             </div>
         </div>
 
-        <div id="loadingIndicator" class="loading">
-            Chargement des voitures disponibles
-        </div>
+        <div id="loadingIndicator" class="loading" data-translate-key="loading_cars">Chargement des voitures disponibles</div>
         
         <div id="carsContainer" class="cars-grid" style="display: none;"></div>
         
-        <div id="scrollLoader" class="scroll-loader">
-            Chargement de plus de voitures
-        </div>
+        <div id="scrollLoader" class="scroll-loader" data-translate-key="load_more">Chargement de plus de voitures</div>
 
         <div id="emptyState" class="empty-state" style="display: none;">
-            <h3>🚗 Aucune voiture disponible</h3>
-            <p>Revenez bientôt pour découvrir nos nouvelles arrivées</p>
+            <h3 data-translate-key="empty_state_title">🚗 Aucune voiture disponible</h3>
+            <p data-translate-key="empty_state_text">Revenez bientôt pour découvrir nos nouvelles arrivées</p>
         </div>
 
         <div id="noResults" class="no-results" style="display: none;">
-            <h3>Aucun résultat trouvé</h3>
-            <p>Essayez de modifier vos critères de recherche</p>
+            <h3 data-translate-key="no_results_title">Aucun résultat trouvé</h3>
+            <p data-translate-key="no_results_text">Essayez de modifier vos critères de recherche</p>
         </div>
     </div>
 
@@ -622,59 +738,63 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
-                <h3>🚗 AutoMaroc</h3>
-                <p>Votre partenaire de confiance pour l'achat de voitures d'occasion au Maroc.</p>
-                <p>Depuis 2020, nous offrons les meilleures opportunités automobiles avec un service client exceptionnel.</p>
+                <h3 data-translate-key="footer_company_title">🚗 AutoMaroc</h3>
+                <p data-translate-key="footer_company_text1">Votre partenaire de confiance pour l'achat de voitures d'occasion au Maroc.</p>
+                <p data-translate-key="footer_company_text2">Depuis 2020, nous offrons les meilleures opportunités automobiles avec un service client exceptionnel.</p>
             </div>
 
             <div class="footer-section">
-                <h3>📞 Contactez-nous</h3>
+                <h3 data-translate-key="footer_contact_title">📞 Contactez-nous</h3>
                 <div class="contact-info">
-                    <p><strong>Téléphone :</strong><br>
-                    <a href="tel:+212600000000">+212 6 00 00 00 00</a></p>
+                    <p><strong data-translate-key="footer_phone_label">Téléphone :</strong><br>
+                    <a href="tel:+212600000000" data-translate-key="footer_phone">+212 6 00 00 00 00</a></p>
                 </div>
                 <div class="contact-info">
-                    <p><strong>WhatsApp :</strong><br>
-                    <a href="https://wa.me/212600000000" target="_blank">+212 6 00 00 00 00</a></p>
+                    <p><strong data-translate-key="footer_whatsapp_label">WhatsApp :</strong><br>
+                    <a href="https://wa.me/212600000000" target="_blank" data-translate-key="footer_phone">+212 6 00 00 00 00</a></p>
                 </div>
                 <div class="contact-info">
-                    <p><strong>Email :</strong><br>
-                    <a href="mailto:contact@automaroc.ma">contact@automaroc.ma</a></p>
+                    <p><strong data-translate-key="footer_email_label">Email :</strong><br>
+                    <a href="mailto:contact@automaroc.ma" data-translate-key="footer_email">contact@automaroc.ma</a></p>
                 </div>
                 <div class="contact-info">
-                    <p><strong>Adresse :</strong><br>
-                    Casablanca, Maroc</p>
+                    <p><strong data-translate-key="footer_address_label">Adresse :</strong><br>
+                    <span data-translate-key="footer_address">Casablanca, Maroc</span></p>
                 </div>
             </div>
 
             <div class="footer-section">
-                <h3>🕒 Horaires d'ouverture</h3>
-                <p><strong>Lundi - Vendredi :</strong> 9h00 - 18h00</p>
-                <p><strong>Samedi :</strong> 9h00 - 16h00</p>
-                <p><strong>Dimanche :</strong> Fermé</p>
+                <h3 data-translate-key="footer_hours_title">🕒 Horaires d'ouverture</h3>
+                <p data-translate-key="footer_hours_weekdays">Lundi - Vendredi : 9h00 - 18h00</p>
+                <p data-translate-key="footer_hours_saturday">Samedi : 9h00 - 16h00</p>
+                <p data-translate-key="footer_hours_sunday">Dimanche : Fermé</p>
                 <br>
-                <p><strong>🚨 Urgences :</strong> 24h/24 - 7j/7</p>
-                <p><strong>📞 Ligne directe :</strong><br>
-                <a href="tel:+212600000000" style="color: #ffc107; font-weight: bold;">+212 6 00 00 00 00</a></p>
+                <p data-translate-key="footer_hours_emergency">🚨 Urgences : 24h/24 - 7j/7</p>
+                <p><strong data-translate-key="footer_hours_emergency_phone_label">📞 Ligne directe :</strong><br>
+                <a href="tel:+212600000000" style="color: #ffc107; font-weight: bold;" data-translate-key="footer_phone">+212 6 00 00 00 00</a></p>
             </div>
 
             <div class="footer-section">
-                <h3>ℹ️ Nos Services</h3>
-                <p>✅ Garantie sur tous nos véhicules</p>
-                <p>🔧 Service après-vente</p>
-                <p>💰 Financement disponible</p>
-                <p>🚗 Reprise de votre ancien véhicule</p>
-                <p>📋 Expertise gratuite</p>
-                <p>🚚 Livraison possible</p>
-                <p>📄 Aide aux démarches administratives</p>
+                <h3 data-translate-key="footer_services_title">ℹ️ Nos Services</h3>
+                <p data-translate-key="footer_service_warranty">✅ Garantie sur tous nos véhicules</p>
+                <p data-translate-key="footer_service_aftersales">🔧 Service après-vente</p>
+                <p data-translate-key="footer_service_financing">💰 Financement disponible</p>
+                <p data-translate-key="footer_service_tradein">🚗 Reprise de votre ancien véhicule</p>
+                <p data-translate-key="footer_service_expertise">📋 Expertise gratuite</p>
+                <p data-translate-key="footer_service_delivery">🚚 Livraison possible</p>
+                <p data-translate-key="footer_service_admin">📄 Aide aux démarches administratives</p>
             </div>
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; 2024 AutoMaroc. Tous droits réservés. | Voitures d'occasion de qualité | 
-            <a href="tel:+212600000000" style="color: #ffc107;">📞 +212 6 00 00 00 00</a></p>
+            <p data-translate-key="footer_copyright">© 2024 AutoMaroc. Tous droits réservés. | Voitures d'occasion de qualité | 
+            <a href="tel:+212600000000" style="color: #ffc107;" data-translate-key="footer_phone">📞 +212 6 00 00 00 00</a></p>
         </div>
     </footer>
+
+    <!-- Translation Scripts -->
+    <script src="translations.js"></script>
+    <script src="translate.js"></script>
 
     <!-- Firebase SDK -->
     <script type="module">
@@ -683,10 +803,8 @@
             getFirestore, 
             collection, 
             getDocs, 
-            onSnapshot, 
             orderBy, 
             query, 
-            where,
             limit,
             startAfter
         } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -731,7 +849,6 @@
         window.toggleDarkMode = function() {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
         }
@@ -742,7 +859,6 @@
 
         // Afficher les voitures
         function displayCars(cars, append = false) {
-            // Masquer les indicateurs
             loadingIndicator.style.display = 'none';
             scrollLoader.classList.remove('active');
 
@@ -750,6 +866,7 @@
                 emptyState.style.display = 'none';
                 noResults.style.display = 'none';
                 displayedCars = [];
+                carsContainer.innerHTML = '';
             }
 
             if (cars.length === 0 && !append) {
@@ -764,16 +881,14 @@
 
             carsContainer.style.display = 'grid';
             
-            if (!append) {
-                carsContainer.innerHTML = '';
-            }
-
             cars.forEach(car => {
                 const carCard = document.createElement('div');
                 carCard.className = 'car-card';
                 
                 const phoneNumber = "212600000000";
-                const whatsappMessage = `Bonjour, je suis intéressé(e) par la ${car.data.marque} ${car.data.modele} de ${car.data.annee} au prix de ${car.data.prix.toLocaleString()} MAD.`;
+                const message = currentLanguage === 'ar' ?
+                    `مرحباً، أنا مهتم بسيارة ${car.data.marque} ${car.data.modele} موديل ${car.data.annee} بسعر ${car.data.prix.toLocaleString()} درهم.` :
+                    `Bonjour, je suis intéressé(e) par la ${car.data.marque} ${car.data.modele} de ${car.data.annee} au prix de ${car.data.prix.toLocaleString()} MAD.`;
                 
                 const images = car.data.images || [];
                 const mainImage = images.length > 0 ? images[0] : null;
@@ -781,21 +896,18 @@
                 carCard.innerHTML = `
                     <div class="car-image">
                         <div class="car-badges">
-                            <div class="car-badge badge-etat">${car.data.etat || 'Non spécifié'}</div>
-                            ${car.data.premiereProprio === 'Première main' ? '<div class="car-badge badge-premiere-main">1ère Main</div>' : ''}
+                            <div class="car-badge badge-etat">${car.data.etat || translations['not_specified'][currentLanguage]}</div>
+                            ${car.data.premiereProprio === 'Première main' ? `<div class="car-badge badge-premiere-main">${translations['first_owner'][currentLanguage]}</div>` : ''}
                         </div>
                         ${mainImage ? 
-                            `<img src="${mainImage}" alt="${car.data.marque} ${car.data.modele}" onerror="this.parentElement.innerHTML='<div class=\\'car-image-placeholder\\'>Image non disponible</div>'">
-                             ${images.length > 1 ? `<div class="image-counter">📷 ${images.length}</div>` : ''}` :
-                            '<div class="car-image-placeholder">Aucune image</div>'
+                            `<img src="${mainImage}" alt="${car.data.marque} ${car.data.modele}" onerror="this.parentElement.innerHTML='<div class=\\'car-image-placeholder\\'>${translations['image_not_available'][currentLanguage]}</div>'">
+                             ${images.length > 1 ? `<div class="image-counter">${translations['image_counter'][currentLanguage].replace('%count%', images.length)}</div>` : ''}` :
+                            `<div class="car-image-placeholder">${translations['no_image'][currentLanguage]}</div>`
                         }
                     </div>
                     <div class="car-info">
-                        <div class="car-title">
-                            ${car.data.marque} ${car.data.modele}
-                        </div>
+                        <div class="car-title">${car.data.marque} ${car.data.modele}</div>
                         <div class="car-price">${car.data.prix.toLocaleString()} MAD</div>
-                        
                         ${images.length > 1 ? `
                             <div class="images-gallery">
                                 ${images.slice(0, 5).map((img, index) => `
@@ -804,9 +916,8 @@
                                 ${images.length > 5 ? `<div style="display: flex; align-items: center; font-size: 12px; color: #666; padding: 5px;">+${images.length - 5}</div>` : ''}
                             </div>
                         ` : ''}
-                        
                         <div class="car-details-section">
-                            <div class="details-title">Caractéristiques principales</div>
+                            <div class="details-title">${currentLanguage === 'ar' ? 'الخصائص الأساسية' : 'Caractéristiques principales'}</div>
                             <div class="car-specs">
                                 <div class="spec-item">
                                     <div class="spec-icon">📅</div>
@@ -822,21 +933,15 @@
                                 </div>
                                 <div class="spec-item">
                                     <div class="spec-icon">⚙️</div>
-                                    <span>${car.data.boiteVitesse || 'N/A'}</span>
+                                    <span>${car.data.boiteVitesse || translations['not_specified'][currentLanguage]}</span>
                                 </div>
                             </div>
                         </div>
-                        
                         ${car.data.description ? `<div class="car-description">${car.data.description}</div>` : ''}
-                        
                         <div class="car-actions">
-                            <a href="https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}" 
-                               class="btn-contact" target="_blank">
-                                💬 WhatsApp
-                            </a>
-                            <button class="btn-details" onclick="showCarDetails('${car.id}')">
-                                Détails
-                            </button>
+                            <a href="https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}" 
+                               class="btn btn-contact" target="_blank" data-translate-key="whatsapp_button">💬 WhatsApp</a>
+                            <button class="btn btn-details" onclick="showCarDetails('${car.id}')" data-translate-key="details_button">Détails</button>
                         </div>
                     </div>
                 `;
@@ -849,7 +954,9 @@
 
         // Mettre à jour les statistiques
         function updateStats(count) {
-            carStats.textContent = `${count} voiture${count > 1 ? 's' : ''} affichée${count > 1 ? 's' : ''}`;
+            carStats.textContent = currentLanguage === 'ar' ?
+                `${count} سيارة${count !== 1 ? '' : ''} معروضة` :
+                `${count} voiture${count !== 1 ? 's' : ''} affichée${count !== 1 ? 's' : ''}`;
         }
 
         // Charger les voitures avec pagination
@@ -863,18 +970,16 @@
             }
             
             try {
-                let q;
+                let q = query(
+                    collection(db, 'voitures'),
+                    orderBy('dateAjout', 'desc'),
+                    limit(CARS_PER_PAGE)
+                );
                 if (loadMore && lastVisible) {
                     q = query(
                         collection(db, 'voitures'),
                         orderBy('dateAjout', 'desc'),
                         startAfter(lastVisible),
-                        limit(CARS_PER_PAGE)
-                    );
-                } else {
-                    q = query(
-                        collection(db, 'voitures'),
-                        orderBy('dateAjout', 'desc'),
                         limit(CARS_PER_PAGE)
                     );
                 }
@@ -889,13 +994,10 @@
                     lastVisible = snapshot.docs[snapshot.docs.length - 1];
                 }
                 
-                const newCars = [];
-                snapshot.forEach((doc) => {
-                    newCars.push({
-                        id: doc.id,
-                        data: doc.data()
-                    });
-                });
+                const newCars = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    data: doc.data()
+                }));
                 
                 if (loadMore) {
                     allCars = [...allCars, ...newCars];
@@ -903,7 +1005,6 @@
                     allCars = newCars;
                 }
                 
-                // Si des filtres sont appliqués, on filtre les nouvelles voitures
                 if (hasActiveFilters()) {
                     const filteredNewCars = filterCars(newCars);
                     displayCars(filteredNewCars, loadMore);
@@ -983,8 +1084,8 @@
             const currentMarque = marqueFilter.value;
             const currentQuick = quickFilter.value;
             
-            marqueFilter.innerHTML = '<option value="">Toutes les marques</option>';
-            quickFilter.innerHTML = '<option value="">Toutes les marques</option>';
+            marqueFilter.innerHTML = `<option value="" data-translate-key="filter_brand_all">${translations['filter_brand_all'][currentLanguage]}</option>`;
+            quickFilter.innerHTML = `<option value="" data-translate-key="quick_filter_all">${translations['quick_filter_all'][currentLanguage]}</option>`;
             
             marques.forEach(marque => {
                 const option1 = new Option(marque, marque);
@@ -1018,8 +1119,7 @@
             document.getElementById('kmMax').value = '';
             document.getElementById('quickFilter').value = '';
             searchInput.value = '';
-            
-            displayCars(allCars);
+            applyFilters();
         };
 
         // Variables pour la galerie d'images
@@ -1049,14 +1149,12 @@
                 <div class="modal-content">
                     <img src="${currentCarImages[currentImageIndex]}" class="modal-image" alt="Image voiture">
                     ${currentCarImages.length > 1 ? `
-                        <button class="image-navigation prev-btn" onclick="prevImage()">‹</button>
-                        <button class="image-navigation next-btn" onclick="nextImage()">›</button>
+                        <button class="image-navigation prev-btn" onclick="prevImage()">←</button>
+                        <button class="image-navigation next-btn" onclick="nextImage()">→</button>
                     ` : ''}
                 </div>
                 <div class="modal-controls">
-                    <div style="color: white; font-size: 16px;">
-                        Image ${currentImageIndex + 1} sur ${currentCarImages.length}
-                    </div>
+                    <div data-translate="modal_image_label">${translations['modal_image_label'][currentLanguage].replace('%current%', currentImageIndex + 1).replace('%total%', currentCarImages.length)}</div>
                 </div>
             `;
             
@@ -1094,41 +1192,78 @@
                 const equipements = car.data.equipements || {};
                 
                 const equipementsList = [];
-                if (equipements.climatisation) equipementsList.push('Climatisation');
-                if (equipements.directionAssistee) equipementsList.push('Direction assistée');
-                if (equipements.vitresElectriques) equipementsList.push('Vitres électriques');
-                if (equipements.fermetureCentralisee) equipementsList.push('Fermeture centralisée');
+                if (equipements.climatisation) equipementsList.push(currentLanguage === 'ar' ? 'تكييف' : 'Climatisation');
+                if (equipements.directionAssistee) equipementsList.push(currentLanguage === 'ar' ? 'توجيه معزز' : 'Direction assistée');
+                if (equipements.vitresElectriques) equipementsList.push(currentLanguage === 'ar' ? 'نوافذ كهربائية' : 'Vitres électriques');
+                if (equipements.fermetureCentralisee) equipementsList.push(currentLanguage === 'ar' ? 'قفل مركزي' : 'Fermeture centralisée');
                 if (equipements.abs) equipementsList.push('ABS');
-                if (equipements.airbags) equipementsList.push('Airbags');
+                if (equipements.airbags) equipementsList.push(currentLanguage === 'ar' ? 'وسائد هوائية' : 'Airbags');
                 if (equipements.gps) equipementsList.push('GPS');
                 if (equipements.bluetooth) equipementsList.push('Bluetooth');
-                if (equipements.regulateurVitesse) equipementsList.push('Régulateur de vitesse');
-                if (equipements.jantesAlliage) equipementsList.push('Jantes alliage');
-                if (equipements.toitOuvrant) equipementsList.push('Toit ouvrant');
-                if (equipements.siegesCuir) equipementsList.push('Sièges cuir');
-                if (equipements.siegesChauffants) equipementsList.push('Sièges chauffants');
-                if (equipements.camereRecul) equipementsList.push('Caméra de recul');
-                if (equipements.detecteurAngle) equipementsList.push('Détecteur d\'angle mort');
+                if (equipements.regulateurVitesse) equipementsList.push(currentLanguage === 'ar' ? 'مثبت السرعة' : 'Régulateur de vitesse');
+                if (equipements.jantesAlliage) equipementsList.push(currentLanguage === 'ar' ? 'جنوط ألمنيوم' : 'Jantes alliage');
+                if (equipements.toitOuvrant) equipementsList.push(currentLanguage === 'ar' ? 'سقف بانورامي' : 'Toit ouvrant');
+                if (equipements.siegesCuir) equipementsList.push(currentLanguage === 'ar' ? 'مقاعد جلدية' : 'Sièges cuir');
+                if (equipements.siegesChauffants) equipementsList.push(currentLanguage === 'ar' ? 'مقاعد مدفأة' : 'Sièges chauffants');
+                if (equipements.cameraRecul) equipementsList.push(currentLanguage === 'ar' ? 'كاميرا خلفية' : 'Caméra de recul');
+                if (equipements.detecteurAngle) equipementsList.push(currentLanguage === 'ar' ? 'كاشف الزاوية العمياء' : 'Détecteur d\'angle mort');
                 if (equipements.startStop) equipementsList.push('Start & Stop');
 
-                const equipementsTexte = equipementsList.length > 0 ? 
-                    `\n\n🔧 ÉQUIPEMENTS ET OPTIONS (${equipementsList.length}) :\n• ${equipementsList.join('\n• ')}` : 
-                    '\n\n🔧 ÉQUIPEMENTS : Aucun équipement spécifié';
+                const equipementsTitle = currentLanguage === 'ar' ? '🔧 المعدات والخيارات' : '🔧 ÉQUIPEMENTS & OPTIONS';
+                const equipementsText = equipementsList.length > 0 ? (
+                    `${equipementsTitle} (${equipementsList.length}):\n• ${equipementsList.join('\n• ')}`
+                ) : (
+                    currentLanguage === 'ar' ? '\n\n🔧 المعدات: لا توجد معدات محددة' : '\n\n🔸 ÉQUIPEMENTS : Aucun équipement spécifié'
+                );
 
-                const imagesGallery = images.length > 0 ? 
-                    `\n\n📷 GALERIE D'IMAGES : ${images.length} photo${images.length > 1 ? 's' : ''} disponible${images.length > 1 ? 's' : ''}
-Cliquez sur les miniatures pour voir en grand format.` : 
-                    '\n\n📷 IMAGES : Aucune image disponible';
+                const imagesTitle = currentLanguage === 'ar' ? '📗 معرض الصور' : '📷 GALERIE D\'IMAGES';
+                const imagesText = images.length > 0 ? (
+                    currentLanguage === 'ar' ? 
+                        `\n\n${imagesTitle}: ${images.length} صورة${images.length > 1 ? '' : ''} متاحة\nانقر على الصور المصغرة لعرضها بالحجم الكامل.` :
+                        `\n\n${imagesTitle} : ${images.length} photo${images.length > 1 ? 's' : ''} disponible${images.length > 1 ? 's' : ''}\nCliquez sur les miniatures pour voir en grand format.`
+                ) : (
+                    currentLanguage === 'ar' ? '\n\n📷 صور: لا توجد صور متاحة' : '\n\n📸 IMAGES : Aucune image disponible'
+                );
 
-                alert(`🚗 DÉTAILS COMPLETS DE LA VOITURE
+                const details = currentLanguage === 'ar' ? `
+🚗 تفاصيل السيارة الكاملة
+
+🏷️ المعلومات الأساسية:
+• الماركة: ${car.data.marque}
+• الطراز: ${car.data.modele}
+• السنة: ${car.data.annee}
+• اللون: ${car.data.couleur || 'غير محدد'}
+
+💰 السعر والحالة:
+• السعر: ${car.data.prix.toLocaleString()} درهم
+• الحالة: ${car.data.etat || 'غير محدد'}
+• المالك: ${car.data.premiereProprio || 'غير محدد'}
+• الأصل: ${car.data.origine || 'غير محدد'}
+
+🔧 الخصائص التقنية:
+• عدد الكيلومترات: ${car.data.kilometrage.toLocaleString()} كم
+• الوقود: ${car.data.carburant}
+• ناقل الحركة: ${car.data.boiteVitesse || 'غير محدد'}
+• الهيكل: ${car.data.carrosserie || 'غير محدد'}
+• عدد الأبواب: ${car.data.nbPortes || 'غير متوفر'}
+• عدد المقاعد: ${car.data.nbPlaces || 'غير متوفر'}
+• القدرة الضريبية: ${car.data.puissanceFiscale || 'غير متوفر'} حصان
+• قوة المحرك: ${car.data.puissanceMoteur ? car.data.puissanceMoteur + ' حصان' : 'غير محدد'}
+
+📝 الوصف:
+${car.data.description || 'لا يوجد وصف متاح'}${equipementsText}${imagesText}
+
+📅 تاريخ النشر: ${car.data.dateAjout.toDate().toLocaleDateString('ar-MA')}
+` : `
+🚗 DÉTAILS COMPLETS DE LA VOITURE
 
 🏷️ IDENTIFICATION :
 • Marque : ${car.data.marque}
 • Modèle : ${car.data.modele}
 • Année : ${car.data.annee}
-• Couleur : ${car.data.couleur || 'Non spécifiée'}
+• Couleur : ${car.data.couleur || 'Non spécifié'}
 
-💰 PRIX ET ÉTAT :
+💰 PRIX & ÉTAT :
 • Prix : ${car.data.prix.toLocaleString()} MAD
 • État : ${car.data.etat || 'Non spécifié'}
 • Propriétaire : ${car.data.premiereProprio || 'Non spécifié'}
@@ -1145,9 +1280,12 @@ Cliquez sur les miniatures pour voir en grand format.` :
 • Puissance moteur : ${car.data.puissanceMoteur ? car.data.puissanceMoteur + ' Ch' : 'Non spécifiée'}
 
 📝 DESCRIPTION :
-${car.data.description || 'Aucune description disponible'}${equipementsTexte}${imagesGallery}
+${car.data.description || 'Aucune description disponible'}${equipementsText}${imagesText}
 
-📅 Annonce publiée le : ${car.data.dateAjout.toDate().toLocaleDateString()}`);
+📅 Annonce publiée le : ${car.data.dateAjout.toDate().toLocaleDateString()}
+`;
+
+                alert(details);
             }
         };
 
