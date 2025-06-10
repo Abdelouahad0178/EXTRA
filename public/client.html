@@ -217,6 +217,102 @@
             height: 100%;
         }
 
+        .car-badges {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .car-badge {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-etat {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+        }
+
+        .badge-premiere-main {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #000;
+        }
+
+        .car-specs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+
+        .spec-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #666;
+        }
+
+        .spec-icon {
+            width: 14px;
+            height: 14px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 8px;
+        }
+
+        .equipments-section {
+            margin-bottom: 15px;
+        }
+
+        .equipments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .equipment-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+            padding: 3px 6px;
+            border-radius: 10px;
+        }
+
+        .equipment-icon {
+            color: #28a745;
+            font-size: 10px;
+        }
+
+        .car-details-section {
+            background: rgba(30, 60, 114, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .details-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+
         .image-counter {
             position: absolute;
             bottom: 10px;
@@ -513,13 +609,16 @@
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
-                gap: 20px;
+                gap: 15px;
+                padding: 0 15px;
             }
             
             .search-bar {
                 margin: 0;
                 max-width: none;
                 width: 100%;
+                flex-direction: column;
+                gap: 10px;
             }
             
             .cars-grid {
@@ -577,6 +676,44 @@
                         <option value="Diesel">Diesel</option>
                         <option value="Hybride">Hybride</option>
                         <option value="Électrique">Électrique</option>
+                        <option value="GPL">GPL</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Carrosserie</label>
+                    <select id="carrosserieFilter" class="filter-select">
+                        <option value="">Tous types</option>
+                        <option value="Berline">Berline</option>
+                        <option value="SUV">SUV</option>
+                        <option value="Break">Break</option>
+                        <option value="Coupé">Coupé</option>
+                        <option value="Cabriolet">Cabriolet</option>
+                        <option value="Monospace">Monospace</option>
+                        <option value="Citadine">Citadine</option>
+                        <option value="4x4">4x4</option>
+                        <option value="Pick-up">Pick-up</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Boîte de vitesse</label>
+                    <select id="boiteFilter" class="filter-select">
+                        <option value="">Toutes</option>
+                        <option value="Manuelle">Manuelle</option>
+                        <option value="Automatique">Automatique</option>
+                        <option value="Semi-automatique">Semi-automatique</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>État</label>
+                    <select id="etatFilter" class="filter-select">
+                        <option value="">Tous états</option>
+                        <option value="Neuve">Neuve</option>
+                        <option value="Très bon état">Très bon état</option>
+                        <option value="Bon état">Bon état</option>
+                        <option value="État satisfaisant">État satisfaisant</option>
                     </select>
                 </div>
 
@@ -595,6 +732,15 @@
                         <input type="number" id="anneeMin" class="filter-select" placeholder="Min" min="1990" max="2024">
                         <span>-</span>
                         <input type="number" id="anneeMax" class="filter-select" placeholder="Max" min="1990" max="2024">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>Kilométrage</label>
+                    <div class="price-range">
+                        <input type="number" id="kmMin" class="filter-select" placeholder="Min" min="0">
+                        <span>-</span>
+                        <input type="number" id="kmMax" class="filter-select" placeholder="Max" min="0">
                     </div>
                 </div>
 
@@ -632,7 +778,7 @@
 
         // Configuration Firebase (la même que dans index.html)
         const firebaseConfig = {
-           apiKey: "AIzaSyB9KWeoN3v4FAfyTPh2B-P9LJwyMdaFi2Y",
+             apiKey: "AIzaSyB9KWeoN3v4FAfyTPh2B-P9LJwyMdaFi2Y",
   authDomain: "extravoi.firebaseapp.com",
   databaseURL: "https://extravoi-default-rtdb.firebaseio.com",
   projectId: "extravoi",
@@ -691,7 +837,11 @@
                 
                 carCard.innerHTML = `
                     <div class="car-image">
-                        <div class="car-badge">Disponible</div>
+                        <div class="car-badges">
+                            <div class="car-badge">Disponible</div>
+                            <div class="car-badge badge-etat">${car.data.etat || 'Non spécifié'}</div>
+                            ${car.data.premiereProprio === 'Première main' ? '<div class="car-badge badge-premiere-main">1ère Main</div>' : ''}
+                        </div>
                         ${mainImage ? 
                             `<img src="${mainImage}" alt="${car.data.marque} ${car.data.modele}" onerror="this.parentElement.innerHTML='<div class=\\'car-image-placeholder\\'>Image non disponible</div>'">
                              ${images.length > 1 ? `<div class="image-counter">📷 ${images.length}</div>` : ''}` :
@@ -713,24 +863,83 @@
                             </div>
                         ` : ''}
                         
-                        <div class="car-features">
-                            <div class="feature">
-                                <div class="feature-icon">📅</div>
-                                <span>${car.data.annee}</span>
-                            </div>
-                            <div class="feature">
-                                <div class="feature-icon">⛽</div>
-                                <span>${car.data.carburant}</span>
-                            </div>
-                            <div class="feature">
-                                <div class="feature-icon">🛣️</div>
-                                <span>${car.data.kilometrage.toLocaleString()} km</span>
-                            </div>
-                            <div class="feature">
-                                <div class="feature-icon">📷</div>
-                                <span>${images.length} photo${images.length > 1 ? 's' : ''}</span>
+                        <div class="car-details-section">
+                            <div class="details-title">Caractéristiques principales</div>
+                            <div class="car-specs">
+                                <div class="spec-item">
+                                    <div class="spec-icon">📅</div>
+                                    <span>${car.data.annee}</span>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-icon">⛽</div>
+                                    <span>${car.data.carburant}</span>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-icon">🛣️</div>
+                                    <span>${car.data.kilometrage.toLocaleString()} km</span>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-icon">⚙️</div>
+                                    <span>${car.data.boiteVitesse || 'N/A'}</span>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-icon">🚗</div>
+                                    <span>${car.data.carrosserie || 'N/A'}</span>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-icon">🎨</div>
+                                    <span>${car.data.couleur || 'N/A'}</span>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-icon">🚪</div>
+                                    <span>${car.data.nbPortes || 'N/A'} portes</span>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-icon">👥</div>
+                                    <span>${car.data.nbPlaces || 'N/A'} places</span>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-icon">⚡</div>
+                                    <span>${car.data.puissanceFiscale || 'N/A'} CV</span>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-icon">👤</div>
+                                    <span>${car.data.premiereProprio || 'N/A'}</span>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-icon">🌍</div>
+                                    <span>${car.data.origine || 'N/A'}</span>
+                                </div>
+                                <div class="spec-item">
+                                    <div class="spec-icon">📷</div>
+                                    <span>${images.length} photo${images.length > 1 ? 's' : ''}</span>
+                                </div>
                             </div>
                         </div>
+                        
+                        ${car.data.equipements && Object.values(car.data.equipements).some(Boolean) ? `
+                            <div class="equipments-section">
+                                <div class="details-title">Équipements</div>
+                                <div class="equipments-grid">
+                                    ${car.data.equipements.climatisation ? '<div class="equipment-item"><span class="equipment-icon">❄️</span>Climatisation</div>' : ''}
+                                    ${car.data.equipements.directionAssistee ? '<div class="equipment-item"><span class="equipment-icon">🎯</span>Direction assistée</div>' : ''}
+                                    ${car.data.equipements.vitresElectriques ? '<div class="equipment-item"><span class="equipment-icon">🪟</span>Vitres électriques</div>' : ''}
+                                    ${car.data.equipements.fermetureCentralisee ? '<div class="equipment-item"><span class="equipment-icon">🔒</span>Fermeture centralisée</div>' : ''}
+                                    ${car.data.equipements.abs ? '<div class="equipment-item"><span class="equipment-icon">🛡️</span>ABS</div>' : ''}
+                                    ${car.data.equipements.airbags ? '<div class="equipment-item"><span class="equipment-icon">🎈</span>Airbags</div>' : ''}
+                                    ${car.data.equipements.gps ? '<div class="equipment-item"><span class="equipment-icon">🗺️</span>GPS</div>' : ''}
+                                    ${car.data.equipements.bluetooth ? '<div class="equipment-item"><span class="equipment-icon">📱</span>Bluetooth</div>' : ''}
+                                    ${car.data.equipements.regulateurVitesse ? '<div class="equipment-item"><span class="equipment-icon">🚀</span>Régulateur</div>' : ''}
+                                    ${car.data.equipements.jantesAlliage ? '<div class="equipment-item"><span class="equipment-icon">⭕</span>Jantes alliage</div>' : ''}
+                                    ${car.data.equipements.toitOuvrant ? '<div class="equipment-item"><span class="equipment-icon">🌤️</span>Toit ouvrant</div>' : ''}
+                                    ${car.data.equipements.siegesCuir ? '<div class="equipment-item"><span class="equipment-icon">🪑</span>Sièges cuir</div>' : ''}
+                                    ${car.data.equipements.siegesChauffants ? '<div class="equipment-item"><span class="equipment-icon">🔥</span>Sièges chauffants</div>' : ''}
+                                    ${car.data.equipements.camereRecul ? '<div class="equipment-item"><span class="equipment-icon">📹</span>Caméra recul</div>' : ''}
+                                    ${car.data.equipements.detecteurAngle ? '<div class="equipment-item"><span class="equipment-icon">👁️</span>Détecteur angle</div>' : ''}
+                                    ${car.data.equipements.startStop ? '<div class="equipment-item"><span class="equipment-icon">⏯️</span>Start & Stop</div>' : ''}
+                                </div>
+                            </div>
+                        ` : ''}
                         
                         ${car.data.description ? `<div class="car-description">${car.data.description}</div>` : ''}
                         
@@ -781,23 +990,35 @@
         window.applyFilters = function() {
             const marque = document.getElementById('marqueFilter').value;
             const carburant = document.getElementById('carburantFilter').value;
+            const carrosserie = document.getElementById('carrosserieFilter').value;
+            const boite = document.getElementById('boiteFilter').value;
+            const etat = document.getElementById('etatFilter').value;
             const prixMin = parseInt(document.getElementById('prixMin').value) || 0;
             const prixMax = parseInt(document.getElementById('prixMax').value) || Infinity;
             const anneeMin = parseInt(document.getElementById('anneeMin').value) || 0;
             const anneeMax = parseInt(document.getElementById('anneeMax').value) || 9999;
+            const kmMin = parseInt(document.getElementById('kmMin').value) || 0;
+            const kmMax = parseInt(document.getElementById('kmMax').value) || Infinity;
             const searchTerm = searchInput.value.toLowerCase();
 
             filteredCars = allCars.filter(car => {
                 const matchesMarque = !marque || car.data.marque === marque;
                 const matchesCarburant = !carburant || car.data.carburant === carburant;
+                const matchesCarrosserie = !carrosserie || car.data.carrosserie === carrosserie;
+                const matchesBoite = !boite || car.data.boiteVitesse === boite;
+                const matchesEtat = !etat || car.data.etat === etat;
                 const matchesPrix = car.data.prix >= prixMin && car.data.prix <= prixMax;
                 const matchesAnnee = car.data.annee >= anneeMin && car.data.annee <= anneeMax;
+                const matchesKm = car.data.kilometrage >= kmMin && car.data.kilometrage <= kmMax;
                 const matchesSearch = !searchTerm || 
                     car.data.marque.toLowerCase().includes(searchTerm) ||
                     car.data.modele.toLowerCase().includes(searchTerm) ||
-                    car.data.description.toLowerCase().includes(searchTerm);
+                    (car.data.description && car.data.description.toLowerCase().includes(searchTerm)) ||
+                    car.data.couleur.toLowerCase().includes(searchTerm) ||
+                    car.data.carrosserie.toLowerCase().includes(searchTerm);
 
-                return matchesMarque && matchesCarburant && matchesPrix && matchesAnnee && matchesSearch;
+                return matchesMarque && matchesCarburant && matchesCarrosserie && matchesBoite && 
+                       matchesEtat && matchesPrix && matchesAnnee && matchesKm && matchesSearch;
             });
 
             displayCars(filteredCars);
@@ -807,10 +1028,15 @@
         window.clearFilters = function() {
             document.getElementById('marqueFilter').value = '';
             document.getElementById('carburantFilter').value = '';
+            document.getElementById('carrosserieFilter').value = '';
+            document.getElementById('boiteFilter').value = '';
+            document.getElementById('etatFilter').value = '';
             document.getElementById('prixMin').value = '';
             document.getElementById('prixMax').value = '';
             document.getElementById('anneeMin').value = '';
             document.getElementById('anneeMax').value = '';
+            document.getElementById('kmMin').value = '';
+            document.getElementById('kmMax').value = '';
             document.getElementById('quickFilter').value = '';
             searchInput.value = '';
             
@@ -887,21 +1113,64 @@
             const car = allCars.find(c => c.id === carId);
             if (car) {
                 const images = car.data.images || [];
-                const imagesGallery = images.length > 0 ? 
-                    `\n\n📷 Images disponibles: ${images.length}
-                    Cliquez sur les petites images dans la fiche pour les voir en grand format.` : 
-                    '\n\n📷 Aucune image disponible pour cette voiture.';
-
-                alert(`🚗 Détails de la voiture:
+                const equipements = car.data.equipements || {};
                 
-🏷️ Marque: ${car.data.marque}
-🚙 Modèle: ${car.data.modele}
-📅 Année: ${car.data.annee}
-💰 Prix: ${car.data.prix.toLocaleString()} MAD
-🛣️ Kilométrage: ${car.data.kilometrage.toLocaleString()} km
-⛽ Carburant: ${car.data.carburant}
-📝 Description: ${car.data.description || 'Aucune description disponible'}
-📅 Ajoutée le: ${car.data.dateAjout.toDate().toLocaleDateString()}${imagesGallery}`);
+                // Compter les équipements
+                const equipementsList = [];
+                if (equipements.climatisation) equipementsList.push('Climatisation');
+                if (equipements.directionAssistee) equipementsList.push('Direction assistée');
+                if (equipements.vitresElectriques) equipementsList.push('Vitres électriques');
+                if (equipements.fermetureCentralisee) equipementsList.push('Fermeture centralisée');
+                if (equipements.abs) equipementsList.push('ABS');
+                if (equipements.airbags) equipementsList.push('Airbags');
+                if (equipements.gps) equipementsList.push('GPS');
+                if (equipements.bluetooth) equipementsList.push('Bluetooth');
+                if (equipements.regulateurVitesse) equipementsList.push('Régulateur de vitesse');
+                if (equipements.jantesAlliage) equipementsList.push('Jantes alliage');
+                if (equipements.toitOuvrant) equipementsList.push('Toit ouvrant');
+                if (equipements.siegesCuir) equipementsList.push('Sièges cuir');
+                if (equipements.siegesChauffants) equipementsList.push('Sièges chauffants');
+                if (equipements.camereRecul) equipementsList.push('Caméra de recul');
+                if (equipements.detecteurAngle) equipementsList.push('Détecteur d\'angle mort');
+                if (equipements.startStop) equipementsList.push('Start & Stop');
+
+                const equipementsTexte = equipementsList.length > 0 ? 
+                    `\n\n🔧 ÉQUIPEMENTS ET OPTIONS (${equipementsList.length}) :\n• ${equipementsList.join('\n• ')}` : 
+                    '\n\n🔧 ÉQUIPEMENTS : Aucun équipement spécifié';
+
+                const imagesGallery = images.length > 0 ? 
+                    `\n\n📷 GALERIE D'IMAGES : ${images.length} photo${images.length > 1 ? 's' : ''} disponible${images.length > 1 ? 's' : ''}
+Cliquez sur les miniatures pour voir en grand format.` : 
+                    '\n\n📷 IMAGES : Aucune image disponible';
+
+                alert(`🚗 DÉTAILS COMPLETS DE LA VOITURE
+
+🏷️ IDENTIFICATION :
+• Marque : ${car.data.marque}
+• Modèle : ${car.data.modele}
+• Année : ${car.data.annee}
+• Couleur : ${car.data.couleur || 'Non spécifiée'}
+
+💰 PRIX ET ÉTAT :
+• Prix : ${car.data.prix.toLocaleString()} MAD
+• État : ${car.data.etat || 'Non spécifié'}
+• Propriétaire : ${car.data.premiereProprio || 'Non spécifié'}
+• Origine : ${car.data.origine || 'Non spécifiée'}
+
+🔧 CARACTÉRISTIQUES TECHNIQUES :
+• Kilométrage : ${car.data.kilometrage.toLocaleString()} km
+• Carburant : ${car.data.carburant}
+• Boîte de vitesse : ${car.data.boiteVitesse || 'Non spécifiée'}
+• Carrosserie : ${car.data.carrosserie || 'Non spécifiée'}
+• Nombre de portes : ${car.data.nbPortes || 'N/A'}
+• Nombre de places : ${car.data.nbPlaces || 'N/A'}
+• Puissance fiscale : ${car.data.puissanceFiscale || 'N/A'} CV
+• Puissance moteur : ${car.data.puissanceMoteur ? car.data.puissanceMoteur + ' Ch' : 'Non spécifiée'}
+
+📝 DESCRIPTION :
+${car.data.description || 'Aucune description disponible'}${equipementsTexte}${imagesGallery}
+
+📅 Annonce publiée le : ${car.data.dateAjout.toDate().toLocaleDateString()}`);
             }
         };
 

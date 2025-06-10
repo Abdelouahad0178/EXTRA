@@ -288,6 +288,16 @@
                             <option value="Peugeot">Peugeot</option>
                             <option value="Hyundai">Hyundai</option>
                             <option value="Nissan">Nissan</option>
+                            <option value="Citroën">Citroën</option>
+                            <option value="Dacia">Dacia</option>
+                            <option value="Fiat">Fiat</option>
+                            <option value="Seat">Seat</option>
+                            <option value="Skoda">Skoda</option>
+                            <option value="Opel">Opel</option>
+                            <option value="Mitsubishi">Mitsubishi</option>
+                            <option value="Mazda">Mazda</option>
+                            <option value="Honda">Honda</option>
+                            <option value="Kia">Kia</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -320,7 +330,182 @@
                             <option value="Diesel">Diesel</option>
                             <option value="Hybride">Hybride</option>
                             <option value="Électrique">Électrique</option>
+                            <option value="GPL">GPL</option>
                         </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="etat">État</label>
+                        <select id="etat" required>
+                            <option value="">État de la voiture</option>
+                            <option value="Neuve">Neuve</option>
+                            <option value="Très bon état">Très bon état</option>
+                            <option value="Bon état">Bon état</option>
+                            <option value="État satisfaisant">État satisfaisant</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="boiteVitesse">Boîte de vitesse</label>
+                        <select id="boiteVitesse" required>
+                            <option value="">Type de boîte</option>
+                            <option value="Manuelle">Manuelle</option>
+                            <option value="Automatique">Automatique</option>
+                            <option value="Semi-automatique">Semi-automatique</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="carrosserie">Carrosserie</label>
+                        <select id="carrosserie" required>
+                            <option value="">Type de carrosserie</option>
+                            <option value="Berline">Berline</option>
+                            <option value="SUV">SUV</option>
+                            <option value="Break">Break</option>
+                            <option value="Coupé">Coupé</option>
+                            <option value="Cabriolet">Cabriolet</option>
+                            <option value="Monospace">Monospace</option>
+                            <option value="Citadine">Citadine</option>
+                            <option value="4x4">4x4</option>
+                            <option value="Pick-up">Pick-up</option>
+                            <option value="Utilitaire">Utilitaire</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="couleur">Couleur</label>
+                        <select id="couleur" required>
+                            <option value="">Couleur</option>
+                            <option value="Blanc">Blanc</option>
+                            <option value="Noir">Noir</option>
+                            <option value="Gris">Gris</option>
+                            <option value="Argent">Argent</option>
+                            <option value="Rouge">Rouge</option>
+                            <option value="Bleu">Bleu</option>
+                            <option value="Vert">Vert</option>
+                            <option value="Marron">Marron</option>
+                            <option value="Beige">Beige</option>
+                            <option value="Jaune">Jaune</option>
+                            <option value="Orange">Orange</option>
+                            <option value="Violet">Violet</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nbPortes">Nombre de portes</label>
+                        <select id="nbPortes" required>
+                            <option value="">Nombre de portes</option>
+                            <option value="2">2 portes</option>
+                            <option value="3">3 portes</option>
+                            <option value="4">4 portes</option>
+                            <option value="5">5 portes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="nbPlaces">Nombre de places</label>
+                        <select id="nbPlaces" required>
+                            <option value="">Nombre de places</option>
+                            <option value="2">2 places</option>
+                            <option value="4">4 places</option>
+                            <option value="5">5 places</option>
+                            <option value="7">7 places</option>
+                            <option value="9">9 places</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="puissanceFiscale">Puissance fiscale (CV)</label>
+                        <input type="number" id="puissanceFiscale" min="1" max="50" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="puissanceMoteur">Puissance moteur (Ch)</label>
+                        <input type="number" id="puissanceMoteur" min="50" max="1000">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="premiereProprio">Propriétaire</label>
+                        <select id="premiereProprio" required>
+                            <option value="">Type de propriétaire</option>
+                            <option value="Première main">Première main</option>
+                            <option value="Deuxième main">Deuxième main</option>
+                            <option value="Troisième main">Troisième main</option>
+                            <option value="Plus de 3 propriétaires">Plus de 3 propriétaires</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="origine">Origine</label>
+                        <select id="origine" required>
+                            <option value="">Origine du véhicule</option>
+                            <option value="Maroc">Maroc</option>
+                            <option value="Europe">Europe</option>
+                            <option value="Belgique">Belgique</option>
+                            <option value="France">France</option>
+                            <option value="Allemagne">Allemagne</option>
+                            <option value="Espagne">Espagne</option>
+                            <option value="Autres">Autres</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Équipements et options</label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 10px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="climatisation"> Climatisation
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="directionAssistee"> Direction assistée
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="vitresElectriques"> Vitres électriques
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="fermetureCentralisee"> Fermeture centralisée
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="abs"> ABS
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="airbags"> Airbags
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="gps"> GPS
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="bluetooth"> Bluetooth
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="regulateurVitesse"> Régulateur de vitesse
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="jantesAlliage"> Jantes alliage
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="toitOuvrant"> Toit ouvrant
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="siegesCuir"> Sièges cuir
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="siegesChauffants"> Sièges chauffants
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="camereRecul"> Caméra de recul
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="detecteurAngle"> Détecteur d'angle mort
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="startStop"> Start & Stop
+                        </label>
                     </div>
                 </div>
 
@@ -352,15 +537,275 @@
         </div>
     </div>
 
+    <!-- MODAL DE MODIFICATION -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Modifier la voiture</h2>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            
+            <form id="editCarForm">
+                <input type="hidden" id="editCarId">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editMarque">Marque</label>
+                        <select id="editMarque" required>
+                            <option value="">Sélectionner une marque</option>
+                            <option value="Toyota">Toyota</option>
+                            <option value="Mercedes">Mercedes</option>
+                            <option value="BMW">BMW</option>
+                            <option value="Audi">Audi</option>
+                            <option value="Volkswagen">Volkswagen</option>
+                            <option value="Ford">Ford</option>
+                            <option value="Renault">Renault</option>
+                            <option value="Peugeot">Peugeot</option>
+                            <option value="Hyundai">Hyundai</option>
+                            <option value="Nissan">Nissan</option>
+                            <option value="Citroën">Citroën</option>
+                            <option value="Dacia">Dacia</option>
+                            <option value="Fiat">Fiat</option>
+                            <option value="Seat">Seat</option>
+                            <option value="Skoda">Skoda</option>
+                            <option value="Opel">Opel</option>
+                            <option value="Mitsubishi">Mitsubishi</option>
+                            <option value="Mazda">Mazda</option>
+                            <option value="Honda">Honda</option>
+                            <option value="Kia">Kia</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editModele">Modèle</label>
+                        <input type="text" id="editModele" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editAnnee">Année</label>
+                        <input type="number" id="editAnnee" min="1990" max="2024" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPrix">Prix (MAD)</label>
+                        <input type="number" id="editPrix" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editKilometrage">Kilométrage</label>
+                        <input type="number" id="editKilometrage" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editCarburant">Carburant</label>
+                        <select id="editCarburant" required>
+                            <option value="">Type de carburant</option>
+                            <option value="Essence">Essence</option>
+                            <option value="Diesel">Diesel</option>
+                            <option value="Hybride">Hybride</option>
+                            <option value="Électrique">Électrique</option>
+                            <option value="GPL">GPL</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editEtat">État</label>
+                        <select id="editEtat" required>
+                            <option value="">État de la voiture</option>
+                            <option value="Neuve">Neuve</option>
+                            <option value="Très bon état">Très bon état</option>
+                            <option value="Bon état">Bon état</option>
+                            <option value="État satisfaisant">État satisfaisant</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editBoiteVitesse">Boîte de vitesse</label>
+                        <select id="editBoiteVitesse" required>
+                            <option value="">Type de boîte</option>
+                            <option value="Manuelle">Manuelle</option>
+                            <option value="Automatique">Automatique</option>
+                            <option value="Semi-automatique">Semi-automatique</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editCarrosserie">Carrosserie</label>
+                        <select id="editCarrosserie" required>
+                            <option value="">Type de carrosserie</option>
+                            <option value="Berline">Berline</option>
+                            <option value="SUV">SUV</option>
+                            <option value="Break">Break</option>
+                            <option value="Coupé">Coupé</option>
+                            <option value="Cabriolet">Cabriolet</option>
+                            <option value="Monospace">Monospace</option>
+                            <option value="Citadine">Citadine</option>
+                            <option value="4x4">4x4</option>
+                            <option value="Pick-up">Pick-up</option>
+                            <option value="Utilitaire">Utilitaire</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editCouleur">Couleur</label>
+                        <select id="editCouleur" required>
+                            <option value="">Couleur</option>
+                            <option value="Blanc">Blanc</option>
+                            <option value="Noir">Noir</option>
+                            <option value="Gris">Gris</option>
+                            <option value="Argent">Argent</option>
+                            <option value="Rouge">Rouge</option>
+                            <option value="Bleu">Bleu</option>
+                            <option value="Vert">Vert</option>
+                            <option value="Marron">Marron</option>
+                            <option value="Beige">Beige</option>
+                            <option value="Jaune">Jaune</option>
+                            <option value="Orange">Orange</option>
+                            <option value="Violet">Violet</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editNbPortes">Nombre de portes</label>
+                        <select id="editNbPortes" required>
+                            <option value="">Nombre de portes</option>
+                            <option value="2">2 portes</option>
+                            <option value="3">3 portes</option>
+                            <option value="4">4 portes</option>
+                            <option value="5">5 portes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editNbPlaces">Nombre de places</label>
+                        <select id="editNbPlaces" required>
+                            <option value="">Nombre de places</option>
+                            <option value="2">2 places</option>
+                            <option value="4">4 places</option>
+                            <option value="5">5 places</option>
+                            <option value="7">7 places</option>
+                            <option value="9">9 places</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editPuissanceFiscale">Puissance fiscale (CV)</label>
+                        <input type="number" id="editPuissanceFiscale" min="1" max="50" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPuissanceMoteur">Puissance moteur (Ch)</label>
+                        <input type="number" id="editPuissanceMoteur" min="50" max="1000">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editPremiereProprio">Propriétaire</label>
+                        <select id="editPremiereProprio" required>
+                            <option value="">Type de propriétaire</option>
+                            <option value="Première main">Première main</option>
+                            <option value="Deuxième main">Deuxième main</option>
+                            <option value="Troisième main">Troisième main</option>
+                            <option value="Plus de 3 propriétaires">Plus de 3 propriétaires</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editOrigine">Origine</label>
+                        <select id="editOrigine" required>
+                            <option value="">Origine du véhicule</option>
+                            <option value="Maroc">Maroc</option>
+                            <option value="Europe">Europe</option>
+                            <option value="Belgique">Belgique</option>
+                            <option value="France">France</option>
+                            <option value="Allemagne">Allemagne</option>
+                            <option value="Espagne">Espagne</option>
+                            <option value="Autres">Autres</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Équipements et options</label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 10px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="editClimatisation"> Climatisation
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="editDirectionAssistee"> Direction assistée
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="editVitresElectriques"> Vitres électriques
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="editFermetureCentralisee"> Fermeture centralisée
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="editAbs"> ABS
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="editAirbags"> Airbags
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="editGps"> GPS
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="editBluetooth"> Bluetooth
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="editRegulateurVitesse"> Régulateur de vitesse
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="editJantesAlliage"> Jantes alliage
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="editToitOuvrant"> Toit ouvrant
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="editSiegesCuir"> Sièges cuir
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="editSiegesChauffants"> Sièges chauffants
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="editCamereRecul"> Caméra de recul
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="editDetecteurAngle"> Détecteur d'angle mort
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; font-weight: normal;">
+                            <input type="checkbox" id="editStartStop"> Start & Stop
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="editDescription">Description</label>
+                    <textarea id="editDescription" rows="4" placeholder="Description détaillée de la voiture..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 25px;">
+                    <button type="submit" class="btn" style="flex: 1;">Sauvegarder les modifications</button>
+                    <button type="button" class="btn btn-danger" onclick="closeEditModal()" style="flex: 0 0 auto;">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, orderBy, query } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, orderBy, query, updateDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
         // Configuration Firebase (remplacez par votre configuration)
         const firebaseConfig = {
-           apiKey: "AIzaSyB9KWeoN3v4FAfyTPh2B-P9LJwyMdaFi2Y",
+            apiKey: "AIzaSyB9KWeoN3v4FAfyTPh2B-P9LJwyMdaFi2Y",
   authDomain: "extravoi.firebaseapp.com",
   databaseURL: "https://extravoi-default-rtdb.firebaseio.com",
   projectId: "extravoi",
@@ -458,6 +903,34 @@
                     prix: parseInt(document.getElementById('prix').value),
                     kilometrage: parseInt(document.getElementById('kilometrage').value),
                     carburant: document.getElementById('carburant').value,
+                    etat: document.getElementById('etat').value,
+                    boiteVitesse: document.getElementById('boiteVitesse').value,
+                    carrosserie: document.getElementById('carrosserie').value,
+                    couleur: document.getElementById('couleur').value,
+                    nbPortes: parseInt(document.getElementById('nbPortes').value),
+                    nbPlaces: parseInt(document.getElementById('nbPlaces').value),
+                    puissanceFiscale: parseInt(document.getElementById('puissanceFiscale').value),
+                    puissanceMoteur: parseInt(document.getElementById('puissanceMoteur').value) || null,
+                    premiereProprio: document.getElementById('premiereProprio').value,
+                    origine: document.getElementById('origine').value,
+                    equipements: {
+                        climatisation: document.getElementById('climatisation').checked,
+                        directionAssistee: document.getElementById('directionAssistee').checked,
+                        vitresElectriques: document.getElementById('vitresElectriques').checked,
+                        fermetureCentralisee: document.getElementById('fermetureCentralisee').checked,
+                        abs: document.getElementById('abs').checked,
+                        airbags: document.getElementById('airbags').checked,
+                        gps: document.getElementById('gps').checked,
+                        bluetooth: document.getElementById('bluetooth').checked,
+                        regulateurVitesse: document.getElementById('regulateurVitesse').checked,
+                        jantesAlliage: document.getElementById('jantesAlliage').checked,
+                        toitOuvrant: document.getElementById('toitOuvrant').checked,
+                        siegesCuir: document.getElementById('siegesCuir').checked,
+                        siegesChauffants: document.getElementById('siegesChauffants').checked,
+                        camereRecul: document.getElementById('camereRecul').checked,
+                        detecteurAngle: document.getElementById('detecteurAngle').checked,
+                        startStop: document.getElementById('startStop').checked
+                    },
                     images: imageUrls,
                     description: document.getElementById('description').value,
                     dateAjout: new Date(),
@@ -525,11 +998,21 @@
                             <div><strong>Année:</strong> ${car.data.annee}</div>
                             <div><strong>Kilométrage:</strong> ${car.data.kilometrage.toLocaleString()} km</div>
                             <div><strong>Carburant:</strong> ${car.data.carburant}</div>
+                            <div><strong>État:</strong> ${car.data.etat}</div>
+                            <div><strong>Boîte:</strong> ${car.data.boiteVitesse}</div>
+                            <div><strong>Carrosserie:</strong> ${car.data.carrosserie}</div>
+                            <div><strong>Couleur:</strong> ${car.data.couleur}</div>
+                            <div><strong>Portes:</strong> ${car.data.nbPortes}</div>
+                            <div><strong>Places:</strong> ${car.data.nbPlaces}</div>
+                            <div><strong>Puissance:</strong> ${car.data.puissanceFiscale} CV</div>
+                            <div><strong>Propriétaire:</strong> ${car.data.premiereProprio}</div>
+                            <div><strong>Origine:</strong> ${car.data.origine}</div>
                             <div><strong>Images:</strong> ${images.length}</div>
                             <div><strong>Ajouté:</strong> ${car.data.dateAjout.toDate().toLocaleDateString()}</div>
                         </div>
                         ${car.data.description ? `<div class="car-description">${car.data.description}</div>` : ''}
                         <div class="car-actions">
+                            <button class="btn" onclick="editCar('${car.id}')" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); margin-right: 10px;">Modifier</button>
                             <button class="btn btn-danger" onclick="deleteCar('${car.id}')">Supprimer</button>
                         </div>
                     </div>
@@ -573,6 +1056,135 @@
                 }
             }
         };
+
+        // FONCTIONS DE MODIFICATION
+        window.editCar = async (carId) => {
+            try {
+                const carDoc = await getDoc(doc(db, 'voitures', carId));
+                if (carDoc.exists()) {
+                    const carData = carDoc.data();
+                    populateEditForm(carId, carData);
+                    document.getElementById('editModal').style.display = 'flex';
+                } else {
+                    alert('Voiture non trouvée');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors du chargement des données');
+            }
+        };
+
+        function populateEditForm(carId, carData) {
+            document.getElementById('editCarId').value = carId;
+            document.getElementById('editMarque').value = carData.marque || '';
+            document.getElementById('editModele').value = carData.modele || '';
+            document.getElementById('editAnnee').value = carData.annee || '';
+            document.getElementById('editPrix').value = carData.prix || '';
+            document.getElementById('editKilometrage').value = carData.kilometrage || '';
+            document.getElementById('editCarburant').value = carData.carburant || '';
+            document.getElementById('editEtat').value = carData.etat || '';
+            document.getElementById('editBoiteVitesse').value = carData.boiteVitesse || '';
+            document.getElementById('editCarrosserie').value = carData.carrosserie || '';
+            document.getElementById('editCouleur').value = carData.couleur || '';
+            document.getElementById('editNbPortes').value = carData.nbPortes || '';
+            document.getElementById('editNbPlaces').value = carData.nbPlaces || '';
+            document.getElementById('editPuissanceFiscale').value = carData.puissanceFiscale || '';
+            document.getElementById('editPuissanceMoteur').value = carData.puissanceMoteur || '';
+            document.getElementById('editPremiereProprio').value = carData.premiereProprio || '';
+            document.getElementById('editOrigine').value = carData.origine || '';
+            document.getElementById('editDescription').value = carData.description || '';
+
+            // Équipements
+            const equipements = carData.equipements || {};
+            document.getElementById('editClimatisation').checked = equipements.climatisation || false;
+            document.getElementById('editDirectionAssistee').checked = equipements.directionAssistee || false;
+            document.getElementById('editVitresElectriques').checked = equipements.vitresElectriques || false;
+            document.getElementById('editFermetureCentralisee').checked = equipements.fermetureCentralisee || false;
+            document.getElementById('editAbs').checked = equipements.abs || false;
+            document.getElementById('editAirbags').checked = equipements.airbags || false;
+            document.getElementById('editGps').checked = equipements.gps || false;
+            document.getElementById('editBluetooth').checked = equipements.bluetooth || false;
+            document.getElementById('editRegulateurVitesse').checked = equipements.regulateurVitesse || false;
+            document.getElementById('editJantesAlliage').checked = equipements.jantesAlliage || false;
+            document.getElementById('editToitOuvrant').checked = equipements.toitOuvrant || false;
+            document.getElementById('editSiegesCuir').checked = equipements.siegesCuir || false;
+            document.getElementById('editSiegesChauffants').checked = equipements.siegesChauffants || false;
+            document.getElementById('editCamereRecul').checked = equipements.camereRecul || false;
+            document.getElementById('editDetecteurAngle').checked = equipements.detecteurAngle || false;
+            document.getElementById('editStartStop').checked = equipements.startStop || false;
+        }
+
+        window.closeEditModal = () => {
+            document.getElementById('editModal').style.display = 'none';
+        };
+
+        // Gestion du formulaire de modification
+        document.getElementById('editCarForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const carId = document.getElementById('editCarId').value;
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Mise à jour en cours...';
+
+            try {
+                const updatedData = {
+                    marque: document.getElementById('editMarque').value,
+                    modele: document.getElementById('editModele').value,
+                    annee: parseInt(document.getElementById('editAnnee').value),
+                    prix: parseInt(document.getElementById('editPrix').value),
+                    kilometrage: parseInt(document.getElementById('editKilometrage').value),
+                    carburant: document.getElementById('editCarburant').value,
+                    etat: document.getElementById('editEtat').value,
+                    boiteVitesse: document.getElementById('editBoiteVitesse').value,
+                    carrosserie: document.getElementById('editCarrosserie').value,
+                    couleur: document.getElementById('editCouleur').value,
+                    nbPortes: parseInt(document.getElementById('editNbPortes').value),
+                    nbPlaces: parseInt(document.getElementById('editNbPlaces').value),
+                    puissanceFiscale: parseInt(document.getElementById('editPuissanceFiscale').value),
+                    puissanceMoteur: parseInt(document.getElementById('editPuissanceMoteur').value) || null,
+                    premiereProprio: document.getElementById('editPremiereProprio').value,
+                    origine: document.getElementById('editOrigine').value,
+                    equipements: {
+                        climatisation: document.getElementById('editClimatisation').checked,
+                        directionAssistee: document.getElementById('editDirectionAssistee').checked,
+                        vitresElectriques: document.getElementById('editVitresElectriques').checked,
+                        fermetureCentralisee: document.getElementById('editFermetureCentralisee').checked,
+                        abs: document.getElementById('editAbs').checked,
+                        airbags: document.getElementById('editAirbags').checked,
+                        gps: document.getElementById('editGps').checked,
+                        bluetooth: document.getElementById('editBluetooth').checked,
+                        regulateurVitesse: document.getElementById('editRegulateurVitesse').checked,
+                        jantesAlliage: document.getElementById('editJantesAlliage').checked,
+                        toitOuvrant: document.getElementById('editToitOuvrant').checked,
+                        siegesCuir: document.getElementById('editSiegesCuir').checked,
+                        siegesChauffants: document.getElementById('editSiegesChauffants').checked,
+                        camereRecul: document.getElementById('editCamereRecul').checked,
+                        detecteurAngle: document.getElementById('editDetecteurAngle').checked,
+                        startStop: document.getElementById('editStartStop').checked
+                    },
+                    description: document.getElementById('editDescription').value,
+                    dateModification: new Date()
+                };
+
+                await updateDoc(doc(db, 'voitures', carId), updatedData);
+                closeEditModal();
+                alert('Voiture modifiée avec succès!');
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la modification');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sauvegarder les modifications';
+            }
+        });
+
+        // Fermer le modal en cliquant à l'extérieur
+        document.getElementById('editModal').addEventListener('click', (e) => {
+            if (e.target.id === 'editModal') {
+                closeEditModal();
+            }
+        });
 
         // Écouter les changements en temps réel
         const q = query(collection(db, 'voitures'), orderBy('dateAjout', 'desc'));
