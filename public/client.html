@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AutoMaroc - Voitures d'Occasion</title>
+    <link rel="stylesheet" href="client.css">
     <style>
         * {
             margin: 0;
@@ -236,10 +237,7 @@
             text-transform: uppercase;
         }
 
-        .badge-etat {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-        }
-
+       
         .badge-premiere-main {
             background: linear-gradient(135deg, #ffc107, #e0a800);
             color: #000;
@@ -636,6 +634,12 @@
     </style>
 </head>
 <body>
+    <!-- EN-TÊTE PRINCIPAL -->
+    <div class="top-header">
+        <h1>🚗 AutoMaroc - Voitures d'Occasion</h1>
+        <p>Trouvez la voiture de vos rêves au meilleur prix</p>
+    </div>
+
     <header class="header">
         <div class="header-content">
             <div class="logo">
@@ -771,6 +775,76 @@
         </div>
     </div>
 
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>🚗 AutoMaroc</h3>
+                <p>Votre partenaire de confiance pour l'achat de voitures d'occasion au Maroc.</p>
+                <p>Depuis 2020, nous offrons les meilleures opportunités automobiles avec un service client exceptionnel.</p>
+            </div>
+
+            <div class="footer-section">
+                <h3>📞 Contactez-nous</h3>
+                <div class="contact-info">
+                    <div class="contact-icon">📱</div>
+                    <div>
+                        <strong>Téléphone :</strong><br>
+                        <a href="tel:+212600000000">+212 6 00 00 00 00</a>
+                    </div>
+                </div>
+                <div class="contact-info">
+                    <div class="contact-icon">💬</div>
+                    <div>
+                        <strong>WhatsApp :</strong><br>
+                        <a href="https://wa.me/212600000000" target="_blank">+212 6 00 00 00 00</a>
+                    </div>
+                </div>
+                <div class="contact-info">
+                    <div class="contact-icon">📧</div>
+                    <div>
+                        <strong>Email :</strong><br>
+                        <a href="mailto:contact@automaroc.ma">contact@automaroc.ma</a>
+                    </div>
+                </div>
+                <div class="contact-info">
+                    <div class="contact-icon">📍</div>
+                    <div>
+                        <strong>Adresse :</strong><br>
+                        Casablanca, Maroc
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h3>🕒 Horaires d'ouverture</h3>
+                <p><strong>Lundi - Vendredi :</strong> 9h00 - 18h00</p>
+                <p><strong>Samedi :</strong> 9h00 - 16h00</p>
+                <p><strong>Dimanche :</strong> Fermé</p>
+                <br>
+                <p><strong>🚨 Urgences :</strong> 24h/24 - 7j/7</p>
+                <p><strong>📞 Ligne directe :</strong><br>
+                <a href="tel:+212600000000" style="color: #ffc107; font-weight: bold;">+212 6 00 00 00 00</a></p>
+            </div>
+
+            <div class="footer-section">
+                <h3>ℹ️ Nos Services</h3>
+                <p>✅ Garantie sur tous nos véhicules</p>
+                <p>🔧 Service après-vente</p>
+                <p>💰 Financement disponible</p>
+                <p>🚗 Reprise de votre ancien véhicule</p>
+                <p>📋 Expertise gratuite</p>
+                <p>🚚 Livraison possible</p>
+                <p>📄 Aide aux démarches administratives</p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2024 AutoMaroc. Tous droits réservés. | Voitures d'occasion de qualité | 
+            <a href="tel:+212600000000" style="color: #ffc107;">📞 +212 6 00 00 00 00</a></p>
+        </div>
+    </footer>
+
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -778,7 +852,7 @@
 
         // Configuration Firebase (la même que dans index.html)
         const firebaseConfig = {
-             apiKey: "AIzaSyB9KWeoN3v4FAfyTPh2B-P9LJwyMdaFi2Y",
+           apiKey: "AIzaSyB9KWeoN3v4FAfyTPh2B-P9LJwyMdaFi2Y",
   authDomain: "extravoi.firebaseapp.com",
   databaseURL: "https://extravoi-default-rtdb.firebaseio.com",
   projectId: "extravoi",
@@ -828,7 +902,7 @@
                 const carCard = document.createElement('div');
                 carCard.className = 'car-card';
                 
-                const phoneNumber = "212600000000"; // Remplacez par le vrai numéro
+                const phoneNumber = "212600000000"; // Numéro de téléphone de l'agence
                 const whatsappMessage = `Bonjour, je suis intéressé(e) par la ${car.data.marque} ${car.data.modele} de ${car.data.annee} au prix de ${car.data.prix.toLocaleString()} MAD.`;
                 
                 // Gestion des images multiples
@@ -838,7 +912,7 @@
                 carCard.innerHTML = `
                     <div class="car-image">
                         <div class="car-badges">
-                            <div class="car-badge">Disponible</div>
+                            <div class="car-badge"></div>
                             <div class="car-badge badge-etat">${car.data.etat || 'Non spécifié'}</div>
                             ${car.data.premiereProprio === 'Première main' ? '<div class="car-badge badge-premiere-main">1ère Main</div>' : ''}
                         </div>
