@@ -3,505 +3,950 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoDeal - Voitures d'occasion au Maroc</title>
-    <link rel="stylesheet" href="client.css">
-    <!-- Firebase Modular SDK -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js';
-        import { getFirestore, collection, getDocs, doc, setDoc } from 'https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js';
+    <title>AutoMaroc - Voitures d'Occasion</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        // Expose Firebase functions to global scope
-        window.firebaseApp = { initializeApp, getFirestore, collection, getDocs, doc, setDoc };
-    </script>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1e3c72;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex: 1;
+            max-width: 600px;
+            margin: 0 30px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #1e3c72;
+            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+        }
+
+        .filter-select {
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 20px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .stats {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .hero-section {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+        }
+
+        .hero-section h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .filters-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .price-range {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(30, 60, 114, 0.3);
+        }
+
+        .btn-clear {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        }
+
+        .cars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .car-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .car-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+
+        .car-image {
+            width: 100%;
+            height: 250px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .car-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .car-card:hover .car-image img {
+            transform: scale(1.1);
+        }
+
+        .car-image-placeholder {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 16px;
+            height: 100%;
+        }
+
+        .image-counter {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .images-gallery {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .gallery-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #e1e5e9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-image:hover {
+            transform: scale(1.1);
+            border-color: #1e3c72;
+        }
+
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 80%;
+            position: relative;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        .modal-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn:hover {
+            background: white;
+            color: black;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-navigation {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            font-size: 24px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .image-navigation:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .prev-btn {
+            left: 20px;
+        }
+
+        .next-btn {
+            right: 20px;
+        }
+
+        .car-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .car-info {
+            padding: 25px;
+        }
+
+        .car-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .car-price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .car-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .feature-icon {
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+        }
+
+        .car-description {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .car-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-contact {
+            flex: 1;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            text-align: center;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-contact:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-details {
+            background: rgba(30, 60, 114, 0.1);
+            color: #1e3c72;
+            padding: 12px 20px;
+            border: 2px solid #1e3c72;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-details:hover {
+            background: #1e3c72;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: white;
+            font-size: 18px;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: white;
+        }
+
+        .empty-state h3 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            opacity: 0.7;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            margin: 30px 0;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .search-bar {
+                margin: 0;
+                max-width: none;
+                width: 100%;
+            }
+            
+            .cars-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">🚗 AutoDeal</div>
-                <button class="menu-toggle" id="menuToggle">☰</button>
-                <nav class="nav-menu" id="navMenu">
-                    <a href="#home" class="nav-link active">Accueil</a>
-                    <a href="#inventory" class="nav-link">Inventaire</a>
-                    <a href="#contact" class="nav-link">Contact</a>
-                </nav>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                🚗 AutoMaroc
+            </div>
+            <div class="search-bar">
+                <input type="text" id="searchInput" class="search-input" placeholder="Rechercher par marque, modèle...">
+                <select id="quickFilter" class="filter-select">
+                    <option value="">Toutes les marques</option>
+                </select>
+            </div>
+            <div class="stats" id="carStats">
+                Chargement...
             </div>
         </div>
     </header>
 
-    <main>
-        <section class="hero">
-            <div class="container">
-                <h1>Trouvez votre voiture idéale</h1>
-                <p>Découvrez notre sélection de véhicules d'occasion de qualité au Maroc</p>
-            </div>
-        </section>
+    <div class="container">
+        <div class="hero-section">
+            <h1>Trouvez Votre Voiture Idéale</h1>
+            <p>Découvrez notre sélection de voitures d'occasion de qualité</p>
+        </div>
 
-        <section class="search-section">
-            <div class="container">
-                <div class="search-filters">
-                    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Recherche">
-                    <select id="brandFilter" class="filter-select">
+        <div class="filters-section">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label>Marque</label>
+                    <select id="marqueFilter" class="filter-select">
                         <option value="">Toutes les marques</option>
                     </select>
-                    <select id="yearFilter" class="filter-select">
-                        <option value="">Toutes les années</option>
-                    </select>
-                    <select id="priceFilter" class="filter-select">
-                        <option value="">Tous les prix</option>
-                        <option value="100000">100 000 DHS</option>
-                        <option value="200000">200 000 DHS</option>
-                        <option value="300000">300 000 DHS</option>
-                        <option value="500000">500 000 DHS</option>
-                    </select>
-                    <select id="cityFilter" class="filter-select">
-                        <option value="">Toutes les villes</option>
-                    </select>
-                    <select id="fuelFilter" class="filter-select">
-                        <option value="">Tous les carburants</option>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Carburant</label>
+                    <select id="carburantFilter" class="filter-select">
+                        <option value="">Tous types</option>
                         <option value="Essence">Essence</option>
                         <option value="Diesel">Diesel</option>
                         <option value="Hybride">Hybride</option>
                         <option value="Électrique">Électrique</option>
                     </select>
-                    <button class="btn btn-primary" id="searchBtn">🔍 Rechercher</button>
+                </div>
+
+                <div class="filter-group">
+                    <label>Prix (MAD)</label>
+                    <div class="price-range">
+                        <input type="number" id="prixMin" class="filter-select" placeholder="Min" min="0">
+                        <span>-</span>
+                        <input type="number" id="prixMax" class="filter-select" placeholder="Max" min="0">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>Année</label>
+                    <div class="price-range">
+                        <input type="number" id="anneeMin" class="filter-select" placeholder="Min" min="1990" max="2024">
+                        <span>-</span>
+                        <input type="number" id="anneeMax" class="filter-select" placeholder="Max" min="1990" max="2024">
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <button class="btn" onclick="applyFilters()">Filtrer</button>
+                </div>
+
+                <div class="filter-group">
+                    <button class="btn btn-clear" onclick="clearFilters()">Effacer</button>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <section class="inventory">
-            <div class="container">
-                <div class="sort-controls">
-                    <label for="sortSelect">Trier par:</label>
-                    <select id="sortSelect" class="filter-select">
-                        <option value="recent">Plus récent</option>
-                        <option value="priceAsc">Prix croissant</option>
-                        <option value="priceDesc">Prix décroissant</option>
-                        <option value="mileage">Kilométrage</option>
-                        <option value="year">Année</option>
-                    </select>
-                </div>
-                <div class="cars-grid" id="carsGrid"></div>
-                <div class="loading" id="loading">
-                    <div class="loading-spinner"></div>
-                    <span>Chargement des véhicules...</span>
-                </div>
-                <div class="no-results hidden" id="noResults">
-                    <span class="icon-error">🚗</span>
-                    <h3>Aucune voiture trouvée</h3>
-                    <p>Essayez de modifier vos critères de recherche</p>
-                </div>
-            </section>
+        <div id="loadingIndicator" class="loading">
+            Chargement des voitures disponibles
+        </div>
+        
+        <div id="carsContainer" class="cars-grid" style="display: none;"></div>
+        
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <h3>🚗 Aucune voiture disponible</h3>
+            <p>Revenez bientôt pour découvrir nos nouvelles arrivées</p>
+        </div>
 
-        <section class="modal" id="carDetailsModal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title" id="carDetailsTitle">Détails du véhicule</h2>
-                    <button class="close-btn" onclick="closeModal('carDetailsModal')">×</button>
-                </div>
-                <div class="car-details-content">
-                    <div class="car-images" id="carDetailsImages">
-                        <button class="image-nav prev" onclick="prevImage('carDetailsModal')">&lt;</button>
-                        <button class="image-nav next" onclick="nextImage('carDetailsModal')">&gt;</button>
-                        <div class="image-dots" id="imageDots"></div>
+        <div id="noResults" class="no-results" style="display: none;">
+            <h3>Aucun résultat trouvé</h3>
+            <p>Essayez de modifier vos critères de recherche</p>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, getDocs, onSnapshot, orderBy, query, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Configuration Firebase (la même que dans index.html)
+        const firebaseConfig = {
+           apiKey: "AIzaSyB9KWeoN3v4FAfyTPh2B-P9LJwyMdaFi2Y",
+  authDomain: "extravoi.firebaseapp.com",
+  databaseURL: "https://extravoi-default-rtdb.firebaseio.com",
+  projectId: "extravoi",
+  storageBucket: "extravoi.firebasestorage.app",
+  messagingSenderId: "133163944950",
+  appId: "1:133163944950:web:02f8ee80f4fdff8f7795d7",
+  measurementId: "G-HP1KYPV8LF"
+        };
+
+        // Initialisation Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Variables globales
+        let allCars = [];
+        let filteredCars = [];
+
+        // Éléments DOM
+        const carsContainer = document.getElementById('carsContainer');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const emptyState = document.getElementById('emptyState');
+        const noResults = document.getElementById('noResults');
+        const carStats = document.getElementById('carStats');
+        const searchInput = document.getElementById('searchInput');
+
+        // Afficher les voitures
+        function displayCars(cars) {
+            // Masquer les indicateurs
+            loadingIndicator.style.display = 'none';
+            emptyState.style.display = 'none';
+            noResults.style.display = 'none';
+
+            if (cars.length === 0) {
+                if (allCars.length === 0) {
+                    emptyState.style.display = 'block';
+                } else {
+                    noResults.style.display = 'block';
+                }
+                carsContainer.style.display = 'none';
+                return;
+            }
+
+            carsContainer.style.display = 'grid';
+            carsContainer.innerHTML = '';
+
+            cars.forEach(car => {
+                const carCard = document.createElement('div');
+                carCard.className = 'car-card';
+                
+                const phoneNumber = "212600000000"; // Remplacez par le vrai numéro
+                const whatsappMessage = `Bonjour, je suis intéressé(e) par la ${car.data.marque} ${car.data.modele} de ${car.data.annee} au prix de ${car.data.prix.toLocaleString()} MAD.`;
+                
+                // Gestion des images multiples
+                const images = car.data.images || [];
+                const mainImage = images.length > 0 ? images[0] : null;
+                
+                carCard.innerHTML = `
+                    <div class="car-image">
+                        <div class="car-badge">Disponible</div>
+                        ${mainImage ? 
+                            `<img src="${mainImage}" alt="${car.data.marque} ${car.data.modele}" onerror="this.parentElement.innerHTML='<div class=\\'car-image-placeholder\\'>Image non disponible</div>'">
+                             ${images.length > 1 ? `<div class="image-counter">📷 ${images.length}</div>` : ''}` :
+                            '<div class="car-image-placeholder">Aucune image</div>'
+                        }
                     </div>
                     <div class="car-info">
-                        <h3>📝 Description</h3>
-                        <p id="carDescription"></p>
-                        <h3>🔧 Équipements</h3>
-                        <div class="equipment-tags" id="carEquipment"></div>
-                        <h3>📞 Contacter le propriétaire</h3>
-                        <p id="carOwner"></p>
+                        <div class="car-title">
+                            ${car.data.marque} ${car.data.modele}
+                        </div>
+                        <div class="car-price">${car.data.prix.toLocaleString()} MAD</div>
+                        
+                        ${images.length > 1 ? `
+                            <div class="images-gallery">
+                                ${images.slice(0, 5).map((img, index) => `
+                                    <img src="${img}" class="gallery-image" onclick="openImageModal('${car.id}', ${index})" alt="Image ${index + 1}">
+                                `).join('')}
+                                ${images.length > 5 ? `<div style="display: flex; align-items: center; font-size: 12px; color: #666; padding: 5px;">+${images.length - 5}</div>` : ''}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="car-features">
+                            <div class="feature">
+                                <div class="feature-icon">📅</div>
+                                <span>${car.data.annee}</span>
+                            </div>
+                            <div class="feature">
+                                <div class="feature-icon">⛽</div>
+                                <span>${car.data.carburant}</span>
+                            </div>
+                            <div class="feature">
+                                <div class="feature-icon">🛣️</div>
+                                <span>${car.data.kilometrage.toLocaleString()} km</span>
+                            </div>
+                            <div class="feature">
+                                <div class="feature-icon">📷</div>
+                                <span>${images.length} photo${images.length > 1 ? 's' : ''}</span>
+                            </div>
+                        </div>
+                        
+                        ${car.data.description ? `<div class="car-description">${car.data.description}</div>` : ''}
+                        
                         <div class="car-actions">
-                            <a href="#" id="callButton" class="btn btn-primary">📞 Appeler</a>
-                            <a href="#" id="whatsappButton" class="btn btn-success">💬 WhatsApp</a>
+                            <a href="https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}" 
+                               class="btn-contact" target="_blank">
+                                💬 WhatsApp
+                            </a>
+                            <button class="btn-details" onclick="showCarDetails('${car.id}')">
+                                Détails
+                            </button>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
-    </main>
+                `;
+                carsContainer.appendChild(carCard);
+            });
 
-    <footer>
-        <div class="container">
-            <p>© 2025 AutoDeal - Voitures d'occasion au Maroc</p>
-            <p>Trouvez la voiture de vos rêves en toute confiance</p>
-        </div>
-    </footer>
+            // Mettre à jour les statistiques
+            updateStats(cars.length);
+        }
 
-    <script>
-        // Global variables
-        let db;
-        let cars = [];
-        let currentCarId = null;
+        // Mettre à jour les statistiques
+        function updateStats(count) {
+            carStats.textContent = `${count} voiture${count > 1 ? 's' : ''} disponible${count > 1 ? 's' : ''}`;
+        }
+
+        // Populer les filtres
+        function populateFilters() {
+            const marques = [...new Set(allCars.map(car => car.data.marque))].sort();
+            
+            const marqueFilter = document.getElementById('marqueFilter');
+            const quickFilter = document.getElementById('quickFilter');
+            
+            // Vider les options existantes
+            marqueFilter.innerHTML = '<option value="">Toutes les marques</option>';
+            quickFilter.innerHTML = '<option value="">Toutes les marques</option>';
+            
+            // Ajouter les marques
+            marques.forEach(marque => {
+                const option1 = new Option(marque, marque);
+                const option2 = new Option(marque, marque);
+                marqueFilter.add(option1);
+                quickFilter.add(option2);
+            });
+        }
+
+        // Appliquer les filtres
+        window.applyFilters = function() {
+            const marque = document.getElementById('marqueFilter').value;
+            const carburant = document.getElementById('carburantFilter').value;
+            const prixMin = parseInt(document.getElementById('prixMin').value) || 0;
+            const prixMax = parseInt(document.getElementById('prixMax').value) || Infinity;
+            const anneeMin = parseInt(document.getElementById('anneeMin').value) || 0;
+            const anneeMax = parseInt(document.getElementById('anneeMax').value) || 9999;
+            const searchTerm = searchInput.value.toLowerCase();
+
+            filteredCars = allCars.filter(car => {
+                const matchesMarque = !marque || car.data.marque === marque;
+                const matchesCarburant = !carburant || car.data.carburant === carburant;
+                const matchesPrix = car.data.prix >= prixMin && car.data.prix <= prixMax;
+                const matchesAnnee = car.data.annee >= anneeMin && car.data.annee <= anneeMax;
+                const matchesSearch = !searchTerm || 
+                    car.data.marque.toLowerCase().includes(searchTerm) ||
+                    car.data.modele.toLowerCase().includes(searchTerm) ||
+                    car.data.description.toLowerCase().includes(searchTerm);
+
+                return matchesMarque && matchesCarburant && matchesPrix && matchesAnnee && matchesSearch;
+            });
+
+            displayCars(filteredCars);
+        };
+
+        // Effacer les filtres
+        window.clearFilters = function() {
+            document.getElementById('marqueFilter').value = '';
+            document.getElementById('carburantFilter').value = '';
+            document.getElementById('prixMin').value = '';
+            document.getElementById('prixMax').value = '';
+            document.getElementById('anneeMin').value = '';
+            document.getElementById('anneeMax').value = '';
+            document.getElementById('quickFilter').value = '';
+            searchInput.value = '';
+            
+            filteredCars = [...allCars];
+            displayCars(filteredCars);
+        };
+
+        // Variables pour la galerie d'images
+        let currentImageModal = null;
         let currentImageIndex = 0;
-        let isFirebaseConnected = false;
+        let currentCarImages = [];
 
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', async () => {
-            await initializeFirebase();
-            if (isFirebaseConnected) {
-                setupEventListeners();
+        // Ouvrir la modal d'image
+        window.openImageModal = function(carId, imageIndex = 0) {
+            const car = allCars.find(c => c.id === carId);
+            if (car && car.data.images && car.data.images.length > 0) {
+                currentCarImages = car.data.images;
+                currentImageIndex = imageIndex;
+                showImageModal();
+            }
+        };
+
+        function showImageModal() {
+            if (currentImageModal) {
+                document.body.removeChild(currentImageModal);
+            }
+
+            currentImageModal = document.createElement('div');
+            currentImageModal.className = 'image-modal';
+            currentImageModal.innerHTML = `
+                <button class="close-modal" onclick="closeImageModal()">×</button>
+                <div class="modal-content">
+                    <img src="${currentCarImages[currentImageIndex]}" class="modal-image" alt="Image voiture">
+                    ${currentCarImages.length > 1 ? `
+                        <button class="image-navigation prev-btn" onclick="prevImage()">‹</button>
+                        <button class="image-navigation next-btn" onclick="nextImage()">›</button>
+                    ` : ''}
+                </div>
+                <div class="modal-controls">
+                    <div style="color: white; font-size: 16px;">
+                        Image ${currentImageIndex + 1} sur ${currentCarImages.length}
+                    </div>
+                </div>
+            `;
+            
+            currentImageModal.addEventListener('click', function(e) {
+                if (e.target === currentImageModal) {
+                    closeImageModal();
+                }
+            });
+
+            document.body.appendChild(currentImageModal);
+        }
+
+        window.closeImageModal = function() {
+            if (currentImageModal) {
+                document.body.removeChild(currentImageModal);
+                currentImageModal = null;
+            }
+        };
+
+        window.nextImage = function() {
+            currentImageIndex = (currentImageIndex + 1) % currentCarImages.length;
+            showImageModal();
+        };
+
+        window.prevImage = function() {
+            currentImageIndex = (currentImageIndex - 1 + currentCarImages.length) % currentCarImages.length;
+            showImageModal();
+        };
+
+        // Afficher les détails d'une voiture
+        window.showCarDetails = function(carId) {
+            const car = allCars.find(c => c.id === carId);
+            if (car) {
+                const images = car.data.images || [];
+                const imagesGallery = images.length > 0 ? 
+                    `\n\n📷 Images disponibles: ${images.length}
+                    Cliquez sur les petites images dans la fiche pour les voir en grand format.` : 
+                    '\n\n📷 Aucune image disponible pour cette voiture.';
+
+                alert(`🚗 Détails de la voiture:
+                
+🏷️ Marque: ${car.data.marque}
+🚙 Modèle: ${car.data.modele}
+📅 Année: ${car.data.annee}
+💰 Prix: ${car.data.prix.toLocaleString()} MAD
+🛣️ Kilométrage: ${car.data.kilometrage.toLocaleString()} km
+⛽ Carburant: ${car.data.carburant}
+📝 Description: ${car.data.description || 'Aucune description disponible'}
+📅 Ajoutée le: ${car.data.dateAjout.toDate().toLocaleDateString()}${imagesGallery}`);
+            }
+        };
+
+        // Recherche en temps réel
+        searchInput.addEventListener('input', applyFilters);
+        document.getElementById('quickFilter').addEventListener('change', function() {
+            document.getElementById('marqueFilter').value = this.value;
+            applyFilters();
+        });
+
+        // Gestion des touches du clavier pour la galerie
+        document.addEventListener('keydown', function(e) {
+            if (currentImageModal) {
+                switch(e.key) {
+                    case 'Escape':
+                        closeImageModal();
+                        break;
+                    case 'ArrowLeft':
+                        if (currentCarImages.length > 1) prevImage();
+                        break;
+                    case 'ArrowRight':
+                        if (currentCarImages.length > 1) nextImage();
+                        break;
+                }
             }
         });
 
-        async function initializeFirebase() {
-            const storedConfig = JSON.parse(localStorage.getItem('firebaseConfig') || '{}');
-            if (!storedConfig.apiKey || !storedConfig.projectId) {
-                showNotification('Configuration Firebase manquante. Veuillez configurer via index.html.', 'error');
-                return;
-            }
-
-            try {
-                const firebaseConfig = {
-                    apiKey: storedConfig.apiKey,
-                    authDomain: storedConfig.authDomain || `${storedConfig.projectId}.firebaseapp.com`,
-                    projectId: storedConfig.projectId,
-                    storageBucket: storedConfig.storageBucket || `${storedConfig.projectId}.appspot.com`,
-                    messagingSenderId: storedConfig.messagingSenderId || "123456789",
-                    appId: storedConfig.appId || "1:123456789:web:abcdef123456"
-                };
-
-                const app = window.firebaseApp.initializeApp(firebaseConfig);
-                db = window.firebaseApp.getFirestore(app);
-
-                await window.firebaseApp.setDoc(window.firebaseApp.doc(window.firebaseApp.collection(db, 'test'), 'connection'), {
-                    timestamp: new Date()
+        // Écouter les changements en temps réel
+        const q = query(collection(db, 'voitures'), orderBy('dateAjout', 'desc'));
+        onSnapshot(q, (snapshot) => {
+            allCars = [];
+            snapshot.forEach((doc) => {
+                allCars.push({
+                    id: doc.id,
+                    data: doc.data()
                 });
-                isFirebaseConnected = true;
-                showNotification('Firebase connecté', 'success');
-                await loadCars();
-            } catch (error) {
-                console.error('Erreur d\'initialisation Firebase:', error);
-                showNotification('Erreur d\'initialisation Firebase: ' + error.message, 'error');
-            }
-        }
-
-        function setupEventListeners() {
-            const menuToggle = document.getElementById('menuToggle');
-            const searchBtn = document.getElementById('searchBtn');
-            const searchInput = document.getElementById('searchInput');
-            const brandFilter = document.getElementById('brandFilter');
-            const yearFilter = document.getElementById('yearFilter');
-            const priceFilter = document.getElementById('priceFilter');
-            const cityFilter = document.getElementById('cityFilter');
-            const fuelFilter = document.getElementById('fuelFilter');
-            const sortSelect = document.getElementById('sortSelect');
-            const carDetailsModal = document.getElementById('carDetailsModal');
-
-            if (menuToggle) menuToggle.addEventListener('click', toggleMenu);
-            if (searchBtn) searchBtn.addEventListener('click', filterCars);
-            if (searchInput) searchInput.addEventListener('input', filterCars);
-            if (brandFilter) brandFilter.addEventListener('change', filterCars);
-            if (yearFilter) yearFilter.addEventListener('change', filterCars);
-            if (priceFilter) priceFilter.addEventListener('change', filterCars);
-            if (cityFilter) cityFilter.addEventListener('change', filterCars);
-            if (fuelFilter) fuelFilter.addEventListener('change', filterCars);
-            if (sortSelect) sortSelect.addEventListener('change', () => sortCars(cars));
-            if (carDetailsModal) carDetailsModal.addEventListener('click', (e) => {
-                if (e.target === carDetailsModal) {
-                    closeModal('carDetailsModal');
-                }
             });
-        }
-
-        function toggleMenu() {
-            const navMenu = document.getElementById('navMenu');
-            if (navMenu) navMenu.classList.toggle('active');
-        }
-
-        async function loadCars() {
-            if (!isFirebaseConnected) {
-                showNotification('Firebase non connecté', 'error');
-                return;
-            }
-
-            showLoading(true);
-            try {
-                const snapshot = await window.firebaseApp.getDocs(window.firebaseApp.collection(db, 'cars'));
-                cars = [];
-                snapshot.forEach(doc => {
-                    cars.push({ id: doc.id, ...doc.data() });
-                });
-                populateFilters();
-                sortCars(cars);
-            } catch (error) {
-                console.error('Erreur chargement voitures:', error);
-                showNotification('Erreur lors du chargement des données: ' + error.message, 'error');
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        function displayCars(carsToShow = []) {
-            const grid = document.getElementById('carsGrid');
-            const noResults = document.getElementById('noResults');
-
-            if (!grid || !noResults) return;
-
-            if (carsToShow.length === 0) {
-                grid.innerHTML = '';
-                noResults.classList.remove('hidden');
-                return;
-            }
-
-            noResults.classList.add('hidden');
-            grid.innerHTML = carsToShow.map(car => `
-                <div class="car-card ${car.status || 'available'}" onclick="showCarDetails('${car.id}')">
-                    <div class="car-status status-${car.status || 'available'}">
-                        ${getStatusLabel(car.status || 'available')}
-                    </div>
-                    <div class="car-images">
-                        <div class="car-image" id="carImage-${car.id}">
-                            ${car.photos && car.photos.length > 0 ?
-                                `<img src="${car.photos[0].data}" alt="${car.brand} ${car.model}">` :
-                                '🚗'
-                            }
-                        </div>
-                        ${car.photos && car.photos.length > 1 ? `
-                            <button class="image-nav prev" onclick="event.stopPropagation(); prevImage('${car.id}')">&lt;</button>
-                            <button class="image-nav next" onclick="event.stopPropagation(); nextImage('${car.id}')">&gt;</button>
-                            <div class="image-dots">
-                                ${car.photos.map((_, index) => `
-                                    <div class="image-dot ${index === 0 ? 'active' : ''}" onclick="event.stopPropagation(); showImage('${car.id}', ${index})"></div>
-                                `).join('')}
-                            </div>
-                        ` : ''}
-                    </div>
-                    <div class="car-info">
-                        <div class="car-title">${car.brand || ''} ${car.model || ''}</div>
-                        <div class="car-details">
-                            <span>📅 ${car.year || 'N/A'}</span>
-                            <span>🛣️ ${formatNumber(car.mileage || 0)} km</span>
-                            <span>⛽ ${car.fuel || 'N/A'}</span>
-                            <span>⚙️ ${car.transmission || 'N/A'}</span>
-                        </div>
-                        <div class="car-location">📍 ${car.city || 'Non spécifiée'}</div>
-                        <div class="car-price">${formatPrice(car.price || 0)}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function showCarDetails(id) {
-            const car = cars.find(c => c.id === id);
-            if (!car) return;
-
-            currentCarId = id;
-            currentImageIndex = 0;
-
-            const title = document.getElementById('carDetailsTitle');
-            const description = document.getElementById('carDescription');
-            const owner = document.getElementById('carOwner');
-            const callButton = document.getElementById('callButton');
-            const whatsappButton = document.getElementById('whatsappButton');
-            const equipment = document.getElementById('carEquipment');
-
-            if (title) title.textContent = `${car.brand || ''} ${car.model || ''} (${car.year || 'N/A'})`;
-            if (description) description.textContent = car.description || 'Aucune description';
-            if (owner) owner.innerHTML = `
-                ${car.ownerName || 'Non renseigné'}<br>
-                📞 ${car.ownerPhone || 'Non renseigné'}
-            `;
-            if (callButton) callButton.href = `tel:${car.ownerPhone || '#'}`;
-            if (whatsappButton) whatsappButton.href = `https://wa.me/${car.ownerPhone || '#'}`;
-            if (equipment) equipment.innerHTML = getCarEquipment(car).length > 0 ?
-                getCarEquipment(car).map(eq => `<span class="equipment-tag">${eq}</span>`).join('') :
-                'Aucun équipement renseigné';
-
-            updateCarImages(car);
-            const modal = document.getElementById('carDetailsModal');
-            if (modal) modal.style.display = 'block';
-        }
-
-        function getCarEquipment(car) {
-            const equipment = [];
-            if (car.airCon) equipment.push('Climatisation');
-            if (car.powerSteering) equipment.push('Direction assistée');
-            if (car.electricWindows) equipment.push('Vitres électriques');
-            if (car.abs) equipment.push('ABS');
-            if (car.airbags) equipment.push('Airbags');
-            if (car.gps) equipment.push('GPS');
-            if (car.bluetooth) equipment.push('Bluetooth');
-            if (car.cruiseControl) equipment.push('Régulateur');
-            if (car.centralLocking) equipment.push('Fermeture centralisée');
-            if (car.parkingSensors) equipment.push('Capteurs parking');
-            if (car.sunroof) equipment.push('Toit ouvrant');
-            if (car.leatherSeats) equipment.push('Sièges cuir');
-            return equipment;
-        }
-
-        function updateCarImages(car) {
-            const imagesContainer = document.getElementById('carDetailsImages');
-            if (!imagesContainer) return;
-
-            if (car.photos && car.photos.length > 0) {
-                imagesContainer.innerHTML = `
-                    <div class="car-image">
-                        <img src="${car.photos[currentImageIndex].data}" alt="${car.brand || ''} ${car.model || ''}">
-                    </div>
-                    ${car.photos.length > 1 ? `
-                        <button class="image-nav prev" onclick="prevImage('${car.id}')">&lt;</button>
-                        <button class="image-nav next" onclick="nextImage('${car.id}')">&gt;</button>
-                        <div class="image-dots" id="imageDots">
-                            ${car.photos.map((_, index) => `
-                                <div class="image-dot ${index === currentImageIndex ? 'active' : ''}" onclick="showImage('${car.id}', ${index})"></div>
-                            `).join('')}
-                        </div>
-                    ` : ''}
-                `;
-            } else {
-                imagesContainer.innerHTML = '<div class="car-image">🚗</div>';
-            }
-        }
-
-        function prevImage(carId) {
-            const car = cars.find(c => c.id === carId);
-            if (!car || !car.photos || car.photos.length <= 1) return;
-            currentImageIndex = currentImageIndex > 0 ? currentImageIndex - 1 : car.photos.length - 1;
-            updateCarImages(car);
-        }
-
-        function nextImage(carId) {
-            const car = cars.find(c => c.id === carId);
-            if (!car || !car.photos || car.photos.length <= 1) return;
-            currentImageIndex = currentImageIndex < car.photos.length - 1 ? currentImageIndex + 1 : 0;
-            updateCarImages(car);
-        }
-
-        function showImage(carId, index) {
-            const car = cars.find(c => c.id === carId);
-            if (!car || !car.photos || index >= car.photos.length) return;
-            currentImageIndex = index;
-            updateCarImages(car);
-        }
-
-        function filterCars() {
-            const searchInput = document.getElementById('searchInput');
-            const brandFilter = document.getElementById('brandFilter');
-            const yearFilter = document.getElementById('yearFilter');
-            const priceFilter = document.getElementById('priceFilter');
-            const cityFilter = document.getElementById('cityFilter');
-            const fuelFilter = document.getElementById('fuelFilter');
-
-            if (!searchInput || !brandFilter || !yearFilter || !priceFilter || !cityFilter || !fuelFilter) return;
-
-            const searchTerm = searchInput.value.toLowerCase();
-            const brandValue = brandFilter.value;
-            const yearValue = yearFilter.value;
-            const priceValue = priceFilter.value;
-            const cityValue = cityFilter.value;
-            const fuelValue = fuelFilter.value;
-
-            const filtered = cars.filter(car => {
-                const matchesSearch = searchTerm === '' ||
-                    (car.brand || '').toLowerCase().includes(searchTerm) ||
-                    (car.model || '').toLowerCase().includes(searchTerm) ||
-                    (car.description || '').toLowerCase().includes(searchTerm) ||
-                    (car.vin || '').toLowerCase().includes(searchTerm) ||
-                    (car.ownerName || '').toLowerCase().includes(searchTerm) ||
-                    (car.city || '').toLowerCase().includes(searchTerm);
-                const matchesBrand = brandValue === '' || car.brand === brandValue;
-                const matchesYear = yearValue === '' || (car.year || '').toString() === yearValue;
-                const matchesPrice = priceValue === '' || (car.price || 0) <= parseInt(priceValue);
-                const matchesCity = cityValue === '' || car.city === cityValue;
-                const matchesFuel = fuelValue === '' || car.fuel === fuelValue;
-                return matchesSearch && matchesBrand && matchesYear && matchesPrice && matchesCity && matchesFuel;
-            });
-
-            sortCars(filtered);
-        }
-
-        function sortCars(filteredCars = cars) {
-            const sortSelect = document.getElementById('sortSelect');
-            if (!sortSelect || !Array.isArray(filteredCars)) {
-                displayCars([]);
-                return;
-            }
-
-            const sortValue = sortSelect.value;
-            let sorted = [...filteredCars];
-
-            if (sortValue === 'recent') {
-                sorted.sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
-            } else if (sortValue === 'priceAsc') {
-                sorted.sort((a, b) => (a.price || 0) - (b.price || 0));
-            } else if (sortValue === 'priceDesc') {
-                sorted.sort((a, b) => (b.price || 0) - (a.price || 0));
-            } else if (sortValue === 'mileage') {
-                sorted.sort((a, b) => (a.mileage || 0) - (b.mileage || 0));
-            } else if (sortValue === 'year') {
-                sorted.sort((a, b) => (b.year || 0) - (a.year || 0));
-            }
-
-            displayCars(sorted);
-        }
-
-        function populateFilters() {
-            const brandFilter = document.getElementById('brandFilter');
-            const yearFilter = document.getElementById('yearFilter');
-            const cityFilter = document.getElementById('cityFilter');
-
-            if (!brandFilter || !yearFilter || !cityFilter) return;
-
-            const brands = [...new Set(cars.map(car => car.brand).filter(brand => brand))].sort();
-            brandFilter.innerHTML = '<option value="">Toutes les marques</option>' +
-                brands.map(brand => `<option value="${brand}">${brand}</option>`).join('');
-
-            const years = [...new Set(cars.map(car => car.year).filter(year => year))].sort((a, b) => b - a);
-            yearFilter.innerHTML = '<option value="">Toutes les années</option>' +
-                years.map(year => `<option value="${year}">${year}</option>`).join('');
-
-            const cities = [...new Set(cars.map(car => car.city).filter(city => city))].sort();
-            cityFilter.innerHTML = '<option value="">Toutes les villes</option>' +
-                cities.map(city => `<option value="${city}">${city}</option>`).join('');
-        }
-
-        function getStatusLabel(status) {
-            switch (status) {
-                case 'available': return 'Disponible';
-                case 'reserved': return 'Réservé';
-                case 'sold': return 'Vendu';
-                default: return 'Disponible';
-            }
-        }
-
-        function formatPrice(price) {
-            return new Intl.NumberFormat('fr-MA', {
-                style: 'currency',
-                currency: 'MAD',
-                minimumFractionDigits: 0
-            }).format(price || 0).replace('MAD', 'DHS');
-        }
-
-        function formatNumber(number) {
-            return new Intl.NumberFormat('fr-FR').format(number || 0);
-        }
-
-        function showLoading(show) {
-            const loading = document.getElementById('loading');
-            if (loading) {
-                loading.style.display = show ? 'block' : 'none';
-            }
-        }
-
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
-            setTimeout(() => notification.classList.add('show'), 100);
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => document.body.removeChild(notification), 300);
-            }, 3000);
-        }
-
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) modal.style.display = 'none';
-        }
+            
+            filteredCars = [...allCars];
+            populateFilters();
+            displayCars(filteredCars);
+        }, (error) => {
+            console.error('Erreur Firebase:', error);
+            loadingIndicator.innerHTML = '<p style="color: #ff6b6b;">Erreur de connexion à la base de données.<br>Vérifiez votre connexion internet.</p>';
+        });
     </script>
 </body>
 </html>

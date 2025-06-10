@@ -43,12 +43,14 @@ function initializeFirebase() {
     }
 
     const firebaseConfig = {
-        apiKey: apiKey,
-        authDomain: authDomain || `${projectId}.firebaseapp.com`,
-        projectId: projectId,
-        storageBucket: `${projectId}.appspot.com`,
-        messagingSenderId: "123456789",
-        appId: appId || "demo-app-id"
+       apiKey: "AIzaSyB9KWeoN3v4FAfyTPh2B-P9LJwyMdaFi2Y",
+  authDomain: "extravoi.firebaseapp.com",
+  databaseURL: "https://extravoi-default-rtdb.firebaseio.com",
+  projectId: "extravoi",
+  storageBucket: "extravoi.firebasestorage.app",
+  messagingSenderId: "133163944950",
+  appId: "1:133163944950:web:02f8ee80f4fdff8f7795d7",
+  measurementId: "G-HP1KYPV8LF"
     };
 
     try {
